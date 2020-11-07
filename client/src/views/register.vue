@@ -57,6 +57,7 @@
 </template>
 
 <script>
+
 /* eslint quotes: ["error", "double"] */
 /* eslint-env es6 */
 /* eslint linebreak-style: ["error", "windows"] */
@@ -102,6 +103,9 @@ export default {
 </script>
 
 <style>
+input{
+  width: 20%;
+}
 img {
   max-width: 300px;
   height: auto;

@@ -7,10 +7,18 @@ const messages = require("./db/messages");
 const users = require("./db/users");
 
 const app = express();
+var session = require('express-session');
 
 app.use(morgan("tiny"));
 app.use(cors());
 app.use(bodyParser.json());
+
+
+app.use(session({
+  secret : 'yourSecret',
+  resave : false,
+  saveUninitialized : false,
+  }));
 
 app.get("/", (req, res) => {
   res.json({
@@ -61,8 +69,17 @@ app.get("/register", (req, res) => {
 app.post("/login",  async (req,res) =>{
   var TF = await users.findUser(req.body);
   console.log(TF);
-  res.json({"exists": TF});
+  if (TF) {
+    req.session.username = req.body.username;
+    
+  }
+  res.json({"exists": TF, "user":req.body.username});
 
+});
+
+app.get('/session', function(req,res,next){
+  res.send(req.session.username );
+  console.log(req.session.username ) ;
 });
 
 

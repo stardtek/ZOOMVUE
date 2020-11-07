@@ -66,9 +66,10 @@ export default {
       })
         .then((response) => response.json())
         .then((result) => {
-          console.log(result.exists);
+          console.log(result);
           console.log(" this si result");
           if (result.exists) {
+            localStorage.setItem("user", result.user);
             this.$router.push("/about");
           } else {
             this.error = "error";
