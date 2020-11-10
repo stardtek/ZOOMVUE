@@ -14,9 +14,13 @@ const users = db.get("users");
 
 
 
+async function getUser() {
+  return users.find({},["username", "email"]);
+}
+
 async function getAll() {
-    return users.find({},["username", "email"]);
-  }
+  return users.find({},["username", "email"]);
+}
 
  async function insert (user) {
     const result = schema.validate(user);

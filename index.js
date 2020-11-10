@@ -14,11 +14,15 @@ app.use(cors());
 app.use(bodyParser.json());
 
 
+
 app.use(session({
   secret : 'yourSecret',
   resave : false,
   saveUninitialized : false,
   }));
+
+  app.set('trust proxy', 1) // trust first proxy
+  session.username=[];
 
 app.get("/", (req, res) => {
   res.json({
@@ -60,7 +64,8 @@ app.post("/register", (req, res) => {
     });
 });
 /* za dzabe d sm testiru c dobim use */
-app.get("/register", (req, res) => {
+
+app.get("/allUsers", (req, res) => {
   users.getAll().then((users) => {
     res.json(users);
   });
@@ -70,16 +75,18 @@ app.post("/login",  async (req,res) =>{
   var TF = await users.findUser(req.body);
   console.log(TF);
   if (TF) {
-    req.session.username = req.body.username;
+    console.log("session");
+    console.log(req.body.username);
+    session.username.push( req.body.username );
     
   }
   res.json({"exists": TF, "user":req.body.username});
 
 });
 
-app.get('/session', function(req,res,next){
-  res.send(req.session.username );
-  console.log(req.session.username ) ;
+app.get('/session', function(req,res){
+  res.send(session.username );
+  console.log(session.username ) ;
 });
 
 

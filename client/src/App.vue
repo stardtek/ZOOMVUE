@@ -1,21 +1,6 @@
 <template>
-  <div id="nav">
-    <router-link id="logo" to="/">
-      <img src="@/assets/logo2_1.png" width="80"
-    /></router-link>
-    | <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <div v-if="logedStatus == false">
-    <router-link to="/login">Login</router-link> |
-    <router-link to="/register">Register</router-link> |
-    </div>
-    <div v-if="logedStatus == true">
-      <form @submit.prevent="logout">
-        <button type="submit" >Logout</button>
-    </form>
-    </div>
-  </div>
-  <router-view />
+  <router-view>
+  </router-view >
 </template>
 <script>
 /* eslint quotes: ["error", "double"] */
@@ -38,8 +23,6 @@ export default {
       this.$forceUpdate();
       this.$root.$forceUpdate();
       // this.$router.push("/login");
-    },
-    reload() {
     },
 
   },
