@@ -57,7 +57,6 @@
 <script>
 /* eslint quotes: ["error", "double"] */
 /* eslint-env es6 */
-/* eslint linebreak-style: ["error", "windows"] */
 /* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 
 /* const API_URL = "http://localhost:4000/messages" */
