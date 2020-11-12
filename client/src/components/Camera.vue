@@ -1,9 +1,40 @@
 <template>
   <div>
-    <h1 class="p-3">Hello there</h1>
-    <div class="camera">
-      <video ref="userVideo" width="640" height="480" autoplay></video>
-      <video ref="friendVideo" width="640" height="480" autoplay></video>
+    <div class="row">
+      <div class="col">
+        <h1 class="p-3">{{ username }}</h1>
+      </div>
+    </div>
+    <div class="row">
+        <div class="col">
+          <video ref="userVideo" width="320" height="240" autoplay></video>
+        </div>
+    </div>
+    <div class="buttons row">
+      <div class="col">
+        <button class="mdc-button mdc-button--outlined m-3 p-4"
+          v-on:click="audio_enabled = !audio_enabled">
+          <div class="mdc-button__ripple"></div>
+          <div v-if="audio_enabled">
+            <i class="material-icons mdc-button__icon" aria-hidden="true">mic</i>
+          </div>
+          <div v-else>
+            <i class="material-icons mdc-button__icon" aria-hidden="true">mic_off</i>
+          </div>
+          <span class="mdc-button__label">Audio</span>
+        </button>
+        <button class="mdc-button mdc-button--outlined m-3 p-4"
+          v-on:click="video_enabled = !video_enabled">
+          <div class="mdc-button__ripple"></div>
+          <div v-if="video_enabled">
+            <i class="material-icons mdc-button__icon" aria-hidden="true">videocam</i>
+          </div>
+          <div v-else>
+            <i class="material-icons mdc-button__icon" aria-hidden="true">videocam_off</i>
+          </div>
+          <span class="mdc-button__label">Video</span>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -11,6 +42,16 @@
 <script>
 export default {
   name: 'Camera',
+
+  props: [
+    'username',
+  ],
+
+  data: () => ({
+    video_enabled: true,
+    audio_enabled: true,
+  }),
+
   mounted() {
     // Grab elements, create settings, etc.
     const video = this.$refs.userVideo;
