@@ -1,18 +1,20 @@
 <template>
-  <div>
+  <div class="mdc-card m-3">
     <div class="row">
       <div class="col">
         <h1 class="p-3">{{ username }}</h1>
       </div>
     </div>
     <div class="row">
-        <div class="col">
-          <video ref="userVideo" width="320" height="240" autoplay></video>
-        </div>
-    </div>
-    <div class="buttons row">
       <div class="col">
-        <button class="mdc-button mdc-button--outlined m-3 p-4"
+        <video ref="userVideo" autoplay>
+          Video ni na voljo
+        </video>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <button class="mdc-button mdc-button--raised m-3 p-4"
           v-on:click="audio_enabled = !audio_enabled">
           <div class="mdc-button__ripple"></div>
           <div v-if="audio_enabled">
@@ -23,7 +25,7 @@
           </div>
           <span class="mdc-button__label">Audio</span>
         </button>
-        <button class="mdc-button mdc-button--outlined m-3 p-4"
+        <button class="mdc-button mdc-button--raised m-3 p-4"
           v-on:click="video_enabled = !video_enabled">
           <div class="mdc-button__ripple"></div>
           <div v-if="video_enabled">
@@ -72,5 +74,10 @@ export default {
 </script>
 
 <style scoped>
+
+video {
+  max-width: 100%;
+  height: auto;
+}
 
 </style>
