@@ -43,6 +43,9 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+
+  --mdc-theme-primary: #2c3e50;
+  --mdc-theme-on-primary: #FFFAFA;
 }
 #logo {
   float: left;

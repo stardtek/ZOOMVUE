@@ -9,8 +9,10 @@
   },
   "dependencies": {
     "babel-loader": "^8.2.0",
+    "bootstrap": "^4.5.3",
     "core-js": "^3.7.0",
     "eventbus": "0.0.3",
+    "material-components-web": "^8.0.0",
     "vue": "^3.0.0",
     "vue-input-autowidth": "^1.0.10",
     "vue-router": "^4.0.0-rc.2",

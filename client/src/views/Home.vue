@@ -9,15 +9,14 @@
 </template>
 
 <script>
-/* eslint quotes: ["error", "double"] */
 /* eslint-env es6 */
 
 // const API_URL = "http://localhost:4000/messages";
 
 export default {
-  name: "home",
+  name: 'home',
   data: () => ({
-    welcome: "Welcome to Hogs sallon!",
+    welcome: 'Welcome to Hogs sallon!',
   }),
 
   mounted() {},
