@@ -6,18 +6,25 @@
       <img src="../assets/logo2.jpg" alt="" />
     </div>
   </div>
+  <div class="camera">
+    <Camera />
+  </div>
 </template>
 
 <script>
-/* eslint quotes: ["error", "double"] */
 /* eslint-env es6 */
 
 // const API_URL = "http://localhost:4000/messages";
 
+import Camera from '@/components/Camera.vue';
+
 export default {
-  name: "home",
+  name: 'home',
+  components: {
+    Camera,
+  },
   data: () => ({
-    welcome: "Welcome to Hogs sallon!",
+    welcome: 'Welcome to Hogs sallon!',
   }),
 
   mounted() {},

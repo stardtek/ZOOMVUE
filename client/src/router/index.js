@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
+import Camera from '@/components/Camera.vue';
 import Home from '../views/Home.vue';
 
 const routes = [
@@ -24,6 +25,11 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue'),
+  },
+  {
+    path: '/conference',
+    name: 'Conference',
+    component: Camera,
   },
 ];
 
