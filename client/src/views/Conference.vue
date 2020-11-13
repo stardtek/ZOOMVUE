@@ -1,22 +1,19 @@
 <template>
   <div class="container-fluid">
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-      <div class="col" v-for="user in users" :key="user.name">
-        <camera v-bind:username="user.name" />
-      </div>
-    </div>
-    <div class="row">
       <div class="col">
-        <button class="mdc-button mdc-button--raised" v-on:click="send">
-          <span class="mdc-button__label">Send 'hello' via WS</span>
-        </button>
+        <me-camera username="Ta prav ti!!!"></me-camera>
+      </div>
+      <div class="col" v-for="user in users" :key="user.name">
+        <you-camera v-bind:username="user.name" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Camera from '../components/Camera.vue';
+import MeCamera from '../components/MeCamera.vue';
+import YouCamera from '../components/YouCamera.vue';
 
 export default {
   name: 'conference',
@@ -33,30 +30,8 @@ export default {
   }),
 
   components: {
-    Camera,
-  },
-
-  mounted() {
-    this.ws_socket = new WebSocket(this.ws_socket_url);
-
-    // Connection opened
-    this.ws_socket.addEventListener('open', (event) => {
-      // eslint-disable-next-line no-console
-      console.log(event.data);
-      this.ws_socket.send('Hello Server!');
-    });
-
-    // Listen for messages
-    this.ws_socket.addEventListener('message', (event) => {
-      // eslint-disable-next-line no-console
-      console.log('Message from server ', event.data);
-    });
-  },
-
-  methods: {
-    send() {
-      this.ws_socket.send('Hello Server!');
-    },
+    MeCamera,
+    YouCamera,
   },
 };
 </script>

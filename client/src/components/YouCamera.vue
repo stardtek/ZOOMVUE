@@ -7,9 +7,7 @@
     </div>
     <div class="row">
       <div class="col">
-        <video ref="userVideo" autoplay>
-          Video ni na voljo
-        </video>
+        <img ref="camera">
       </div>
     </div>
     <div class="row">
@@ -43,7 +41,7 @@
 
 <script>
 export default {
-  name: 'Camera',
+  name: 'YouCamera',
 
   props: [
     'username',
@@ -52,30 +50,31 @@ export default {
   data: () => ({
     video_enabled: true,
     audio_enabled: true,
+    ws_socket: null,
+    ws_socket_url: 'ws://localhost:4000/websocket',
   }),
 
   mounted() {
-    // Grab elements, create settings, etc.
-    const video = this.$refs.userVideo;
+    this.ws_socket = new WebSocket(this.ws_socket_url);
 
-    // Get access to the camera!
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      // Not adding `{ audio: true }` since we only want video now
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          // video.src = window.URL.createObjectURL(stream);
-          video.srcObject = stream;
-          video.play();
-        });
-    }
+    // Connection opened
+    this.ws_socket.addEventListener('open', () => {
+      // eslint-disable-next-line no-console
+      console.log('Websocket opened!!!');
+    });
+
+    // Listen for messages
+    this.ws_socket.addEventListener('message', (event) => {
+      // Load users video frame
+      this.$refs.camera.src = event.data;
+    });
   },
 };
 </script>
 
 <style scoped>
 
-video {
+img {
   max-width: 100%;
   height: auto;
 }

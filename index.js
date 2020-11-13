@@ -7,7 +7,8 @@ const messages = require("./db/messages");
 const users = require("./db/users");
 
 const app = express();
-const expressWs = require('express-ws')(app);
+const expressWs = require('express-ws');
+expressWs(app);
 
 var session = require('express-session');
 
