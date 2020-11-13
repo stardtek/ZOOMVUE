@@ -7,6 +7,8 @@ const messages = require("./db/messages");
 const users = require("./db/users");
 
 const app = express();
+const expressWs = require('express-ws')(app);
+
 var session = require('express-session');
 
 app.use(morgan("tiny"));
@@ -21,9 +23,14 @@ app.use(session({
   saveUninitialized : false,
   }));
 
-  app.set('trust proxy', 1) // trust first proxy
-  session.username=[];
+app.set('trust proxy', 1) // trust first proxy
+session.username=[];
 
+const websocket = require('./routes/websocket');
+app.use('/websocket', websocket);
+
+// TODO move these endpoints into appropriate routes
+// https://www.tutorialspoint.com/expressjs/expressjs_routing.htm
 app.get("/", (req, res) => {
   res.json({
     message: "Behold The MEVN Stack!",
@@ -60,7 +67,7 @@ app.post("/register", (req, res) => {
       console.log(error);
       res.status(500);
       res.json(error);
-      
+
     });
 });
 /* za dzabe d sm testiru c dobim use */
@@ -78,7 +85,7 @@ app.post("/login",  async (req,res) =>{
     console.log("session");
     console.log(req.body.username);
     session.username.push( req.body.username );
-    
+
   }
   res.json({"exists": TF, "user":req.body.username});
 
