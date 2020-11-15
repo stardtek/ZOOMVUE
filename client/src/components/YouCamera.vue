@@ -7,7 +7,7 @@
     </div>
     <div class="row">
       <div class="col">
-        <img ref="camera">
+        <img ref="camera" v-bind:src="frame">
       </div>
     </div>
     <div class="row">
@@ -45,30 +45,13 @@ export default {
 
   props: [
     'username',
+    'frame',
   ],
 
   data: () => ({
     video_enabled: true,
     audio_enabled: true,
-    ws_socket: null,
-    ws_socket_url: 'ws://localhost:4000/websocket',
   }),
-
-  mounted() {
-    this.ws_socket = new WebSocket(this.ws_socket_url);
-
-    // Connection opened
-    this.ws_socket.addEventListener('open', () => {
-      // eslint-disable-next-line no-console
-      console.log('Websocket opened!!!');
-    });
-
-    // Listen for messages
-    this.ws_socket.addEventListener('message', (event) => {
-      // Load users video frame
-      this.$refs.camera.src = event.data;
-    });
-  },
 };
 </script>
 

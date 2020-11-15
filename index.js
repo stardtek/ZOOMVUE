@@ -27,8 +27,8 @@ app.use(session({
 app.set('trust proxy', 1) // trust first proxy
 session.username=[];
 
-const websocket = require('./routes/websocket');
-app.use('/websocket', websocket);
+const conference = require('./routes/conference');
+app.use('/conference', conference);
 
 // TODO move these endpoints into appropriate routes
 // https://www.tutorialspoint.com/expressjs/expressjs_routing.htm

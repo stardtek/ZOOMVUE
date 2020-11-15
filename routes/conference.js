@@ -13,7 +13,11 @@ router.ws('/', (ws) => {
     clients.forEach((client) => {
       // don't send users own video back to him
       if (client !== ws) {
-        client.send(msg);
+        try {
+          client.send(msg);
+        } catch {
+          console.log('Error: tried to send message to disconnected client...');
+        }
       }
     });
   });
@@ -21,7 +25,7 @@ router.ws('/', (ws) => {
   ws.on('close', () => {
     const disconectedClient = clients.indexOf(ws);
     clients.splice(disconectedClient, 1);
-    console.log('Client disconnected!!!');
+    console.log('Client disconnected...');
   });
 });
 

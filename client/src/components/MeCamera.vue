@@ -42,6 +42,8 @@
 </template>
 
 <script>
+// const userDisconnectedStatus = -1;
+
 export default {
   name: 'MeCamera',
 
@@ -54,7 +56,7 @@ export default {
     audio_enabled: true,
     camera: null,
     ws_socket: null,
-    ws_socket_url: 'ws://localhost:4000/websocket',
+    ws_socket_url: 'ws://192.168.1.14:4000/conference',
     camera_scream: null,
   }),
 
@@ -91,9 +93,13 @@ export default {
 
     // set Camera stream to server interval
     this.camera_scream = setInterval(() => {
-      this.ws_socket.send(this.captureVideo());
-      // TODO this users a lot of resources, probably need some so of regulation
-    }, 100);
+      const data = JSON.stringify({
+        username: this.username,
+        frame: this.captureVideo(),
+      });
+      this.ws_socket.send(data);
+      // TODO this uses a lot of resources, probably need some sort of regulation
+    }, 200);
   },
 
   methods: {
