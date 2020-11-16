@@ -15,9 +15,9 @@
     <div class="row">
       <div class="col">
         <button class="mdc-button mdc-button--raised m-3 p-4"
-          v-on:click="audio_enabled = !audio_enabled">
+          v-on:click="audioEnabled = !audioEnabled">
           <div class="mdc-button__ripple"></div>
-          <div v-if="audio_enabled">
+          <div v-if="audioEnabled">
             <i class="material-icons mdc-button__icon" aria-hidden="true">mic</i>
           </div>
           <div v-else>
@@ -26,9 +26,9 @@
           <span class="mdc-button__label">Audio</span>
         </button>
         <button class="mdc-button mdc-button--raised m-3 p-4"
-          v-on:click="video_enabled = !video_enabled">
+          v-on:click="videoEnabled = !videoEnabled">
           <div class="mdc-button__ripple"></div>
-          <div v-if="video_enabled">
+          <div v-if="videoEnabled">
             <i class="material-icons mdc-button__icon" aria-hidden="true">videocam</i>
           </div>
           <div v-else>
@@ -52,12 +52,11 @@ export default {
   ],
 
   data: () => ({
-    video_enabled: true,
-    audio_enabled: true,
+    videoEnabled: true,
+    audioEnabled: true,
     camera: null,
-    ws_socket: null,
-    ws_socket_url: 'ws://192.168.1.14:4000/conference',
-    camera_scream: null,
+    wsSocket: null,
+    cameraScream: null,
   }),
 
   mounted() {
@@ -76,28 +75,39 @@ export default {
         });
     }
 
-    this.ws_socket = new WebSocket(this.ws_socket_url);
+    this.wsSocket = new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL);
 
     // Listen for messages
-    this.ws_socket.addEventListener('message', () => {
+    this.wsSocket.addEventListener('message', () => {
       // eslint-disable-next-line no-console
       console.log('Message to Me camera!!!');
     });
 
     // Close connection
-    this.ws_socket.addEventListener('close', () => {
-      clearInterval(this.camera_scream);
+    this.wsSocket.addEventListener('close', () => {
+      clearInterval(this.cameraScream);
       // eslint-disable-next-line no-console
       console.log('WebSocket is closed!!!');
     });
 
     // set Camera stream to server interval
-    this.camera_scream = setInterval(() => {
+    this.cameraScream = setInterval(() => {
+      /**
+       * Expected message format
+       *
+       * {
+       *   username: string,
+       *   frame: string -> imgDataURL, users video frame data
+       * }
+       *
+       */
       const data = JSON.stringify({
         username: this.username,
         frame: this.captureVideo(),
       });
-      this.ws_socket.send(data);
+      if (this.wsSocket.bufferedAmount === 0) {
+        this.wsSocket.send(data);
+      }
       // TODO this uses a lot of resources, probably need some sort of regulation
     }, 200);
   },

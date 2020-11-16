@@ -13,9 +13,9 @@
     <div class="row">
       <div class="col">
         <button class="mdc-button mdc-button--raised m-3 p-4"
-          v-on:click="audio_enabled = !audio_enabled">
+          v-on:click="audioEnabled = !audioEnabled">
           <div class="mdc-button__ripple"></div>
-          <div v-if="audio_enabled">
+          <div v-if="audioEnabled">
             <i class="material-icons mdc-button__icon" aria-hidden="true">mic</i>
           </div>
           <div v-else>
@@ -24,9 +24,9 @@
           <span class="mdc-button__label">Audio</span>
         </button>
         <button class="mdc-button mdc-button--raised m-3 p-4"
-          v-on:click="video_enabled = !video_enabled">
+          v-on:click="videoEnabled = !videoEnabled">
           <div class="mdc-button__ripple"></div>
-          <div v-if="video_enabled">
+          <div v-if="videoEnabled">
             <i class="material-icons mdc-button__icon" aria-hidden="true">videocam</i>
           </div>
           <div v-else>
@@ -49,8 +49,8 @@ export default {
   ],
 
   data: () => ({
-    video_enabled: true,
-    audio_enabled: true,
+    videoEnabled: true,
+    audioEnabled: true,
   }),
 };
 </script>

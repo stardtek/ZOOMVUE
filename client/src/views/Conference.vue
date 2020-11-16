@@ -24,9 +24,19 @@ export default {
   data: () => ({
     // TODO get username from session
     your_name: Math.random() * 1000,
+
+    /**
+     * Expected user format
+     *
+     * {
+     *   username: string,
+     *   frame: string -> imgDataURL, users video frame data | -1 means user disconnected
+     * }
+     *
+     */
     users: [],
-    ws_socket: null,
-    ws_socket_url: 'ws://192.168.1.14:4000/conference',
+
+    wsSocket: null,
   }),
 
   components: {
@@ -35,21 +45,21 @@ export default {
   },
 
   mounted() {
-    this.ws_socket = new WebSocket(this.ws_socket_url);
+    this.wsSocket = new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL);
 
     // Connection opened
-    this.ws_socket.addEventListener('open', () => {
+    this.wsSocket.addEventListener('open', () => {
       // eslint-disable-next-line no-console
       console.log('Websocket opened from conference!!!');
     });
 
     // Listen for messages
-    this.ws_socket.addEventListener('message', (event) => {
+    this.wsSocket.addEventListener('message', (event) => {
       // Load users video frame
       // eslint-disable-next-line no-unused-vars
       const data = JSON.parse(event.data);
 
-      // ignore empty messages
+      // ignore empty messages or messages with missing data
       if (!data || !data.username || !data.frame) return;
 
       const userIndex = this.users.findIndex((user) => user.username === data.username);
