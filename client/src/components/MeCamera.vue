@@ -42,20 +42,19 @@
 </template>
 
 <script>
-// const userDisconnectedStatus = -1;
-
 export default {
   name: 'MeCamera',
 
   props: [
     'username',
+    'wsSocket',
   ],
 
   data: () => ({
     videoEnabled: true,
     audioEnabled: true,
     camera: null,
-    wsSocket: null,
+    // wsSocket: null,
     cameraScream: null,
   }),
 
@@ -75,13 +74,13 @@ export default {
         });
     }
 
-    this.wsSocket = new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL);
+    // this.wsSocket = new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL);
 
     // Listen for messages
-    this.wsSocket.addEventListener('message', () => {
-      // eslint-disable-next-line no-console
-      console.log('Message to Me camera!!!');
-    });
+    // this.wsSocket.addEventListener('message', () => {
+    //   // eslint-disable-next-line no-console
+    //   console.log('Message to Me camera!!!');
+    // });
 
     // Close connection
     this.wsSocket.addEventListener('close', () => {
@@ -105,11 +104,15 @@ export default {
         username: this.username,
         frame: this.captureVideo(),
       });
+      // only send if WS is overloaded
       if (this.wsSocket.bufferedAmount === 0) {
         this.wsSocket.send(data);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log('WS overloaded');
       }
       // TODO this uses a lot of resources, probably need some sort of regulation
-    }, 200);
+    }, 250);
   },
 
   methods: {

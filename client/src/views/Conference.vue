@@ -1,12 +1,11 @@
 <template>
   <div class="container-fluid">
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-      <div class="col">
-        <me-camera v-bind:username="your_name"></me-camera>
+      <div class="col" v-if="wsSocket !== null">
+        <me-camera v-bind:username="yourName" v-bind:wsSocket="wsSocket"></me-camera>
       </div>
       <div class="col" v-for="user in users" :key="user.username">
         <you-camera v-bind:username="user.username" v-bind:frame="user.frame" />
-        <div>{{ user.frame }}</div>
       </div>
     </div>
   </div>
@@ -23,7 +22,7 @@ export default {
 
   data: () => ({
     // TODO get username from session
-    your_name: Math.random() * 1000,
+    yourName: Math.random() * 1000,
 
     /**
      * Expected user format
@@ -35,7 +34,6 @@ export default {
      *
      */
     users: [],
-
     wsSocket: null,
   }),
 
