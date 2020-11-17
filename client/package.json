@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
+    "serve-https": "vue-cli-service serve --https",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
@@ -11,6 +12,7 @@
     "babel-loader": "^8.2.0",
     "bootstrap": "^4.5.3",
     "core-js": "^3.7.0",
+    "dotenv": "^8.2.0",
     "eventbus": "0.0.3",
     "material-components-web": "^8.0.0",
     "vue": "^3.0.0",
