@@ -6,9 +6,24 @@ const morgan = require("morgan");
 const messages = require("./db/messages");
 const users = require("./db/users");
 
-const app = express();
+const fs = require('fs');
+const https = require('https');
+require('dotenv').config();
+
 const expressWs = require('express-ws');
-expressWs(app);
+let app = express();
+
+if (process.env.HTTPS == 1) {
+  // TODO this could be wrong or just needs proper SSL certificate and domain to work
+  // WebSocket via SSL
+  expressWs(app, https.createServer({
+    key: fs.readFileSync(process.env.SSL_KEY),
+    cert: fs.readFileSync(process.env.SSL_CERT),
+  }));
+} else {
+  expressWs(app);
+}
+
 
 var session = require('express-session');
 
@@ -100,5 +115,5 @@ app.get('/session', function(req,res){
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => {
-  console.log(`listening on ${port}`);
+  console.log(`Listening on ${process.env.HTTPS == 1 ? 'https' : 'http'}://localhost:${port}`);
 });

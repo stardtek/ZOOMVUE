@@ -112,7 +112,7 @@ export default {
         console.log('WS overloaded');
       }
       // TODO this uses a lot of resources, probably need some sort of regulation
-    }, 250);
+    }, 150);
   },
 
   methods: {
@@ -122,7 +122,7 @@ export default {
       canvas.height = this.$refs.camera.videoHeight;
       const canvasContext = canvas.getContext('2d');
       canvasContext.drawImage(this.$refs.camera, 0, 0);
-      return canvas.toDataURL('image/png');
+      return canvas.toDataURL('image/webp', 0.3);
     },
   },
 };
