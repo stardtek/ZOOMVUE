@@ -1,5 +1,22 @@
 <template>
   <div class="container-fluid">
+    <div id="nav">
+      <router-link id="logo" to="/">
+        <img src="@/assets/logo2_1.png" width="80" alt="LOGO"/></router-link>
+      | <router-link to="/">Home</router-link> |
+      <router-link to="/about">About</router-link> |
+      <div v-if="logedStatus == false">
+      <router-link to="/login">Login</router-link> |
+      <router-link to="/register">Register</router-link> |
+      </div>
+      <div v-if="logedStatus == true">
+        <form @submit.prevent="logout">
+          <button type="submit" >Logout</button>
+          <router-link to="/conference">Conference</router-link> |
+      </form>
+      </div>
+
+    </div>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
       <div class="col" v-if="wsSocket !== null">
         <me-camera v-bind:username="yourName" v-bind:wsSocket="wsSocket"></me-camera>
@@ -22,6 +39,7 @@ export default {
 
   data: () => ({
     // TODO get username from session
+
     yourName: Math.random() * 1000,
 
     /**
@@ -73,6 +91,20 @@ export default {
         this.users[userIndex].frame = data.frame;
       }
     });
+  },
+  computed: {
+    logedStatus: () => {
+      if (localStorage.getItem('user')) {
+        return true;
+      }
+      return false;
+    },
+    logedName: () => {
+      if (localStorage.getItem('user')) {
+        return localStorage.getItem('user');
+      }
+      return Math.random() * 1000;
+    },
   },
 };
 </script>
