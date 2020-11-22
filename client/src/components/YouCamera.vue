@@ -8,6 +8,7 @@
     <div class="row">
       <div class="col">
         <img ref="camera" v-bind:src="frame">
+        <video ref="video"></video>
       </div>
     </div>
     <div class="row">
@@ -46,12 +47,17 @@ export default {
   props: [
     'username',
     'frame',
+    'rtc',
   ],
 
   data: () => ({
     videoEnabled: true,
     audioEnabled: true,
   }),
+
+  mounted() {
+    this.$refs.video.srcObject = this.rtc;
+  },
 };
 </script>
 

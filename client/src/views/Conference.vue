@@ -53,6 +53,7 @@ export default {
      */
     users: [],
     wsSocket: null,
+    rtcConnection: new RTCPeerConnection(null),
   }),
 
   components: {
@@ -61,6 +62,7 @@ export default {
   },
 
   mounted() {
+    // this.rtcConnection = new RTCPeerConnection(null);
     this.wsSocket = new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL);
 
     // Connection opened
@@ -70,10 +72,25 @@ export default {
     });
 
     // Listen for messages
-    this.wsSocket.addEventListener('message', (event) => {
+    this.wsSocket.addEventListener('message', async (event) => {
       // Load users video frame
       // eslint-disable-next-line no-unused-vars
       const data = JSON.parse(event.data);
+
+      if (data.rtcOffer) {
+        // eslint-disable-next-line no-console
+        console.log('offer', data.rtcOffer);
+        await this.rtcConnection.setRemoteDescription(data.rtcOffer);
+        // eslint-disable-next-line no-console
+        console.log(this.rtcConnection);
+        const answer = await this.rtcConnection.createAnswer();
+        this.wsSocket.send(JSON.stringify({
+          name: 'you',
+          rtc: true,
+          rtcOffer: answer,
+        }));
+        return;
+      }
 
       // ignore empty messages or messages with missing data
       if (!data || !data.username || !data.frame) return;

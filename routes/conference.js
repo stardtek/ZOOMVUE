@@ -24,7 +24,7 @@ router.ws('/', (ws) => {
     // broadcast frame to all connected clients
     clients.forEach((client) => {
       // don't send users own video back to him
-      if (client !== ws) {
+      // if (client !== ws) {
         try {
           if (client.bufferedAmount === 0) {
             client.send(msg);
@@ -34,7 +34,8 @@ router.ws('/', (ws) => {
         } catch {
           console.log('Error: Tried to send message to disconnected client...');
         }
-      } else if (!client.username) {
+      // } else
+        if (!client.username) {
         // add username to each socket, so we can tell later which user disconnected
         const msgData = JSON.parse(msg);
         if (msgData.username) {

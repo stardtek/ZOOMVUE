@@ -56,9 +56,12 @@ export default {
     camera: null,
     // wsSocket: null,
     cameraScream: null,
+    rtcConnection: null,
   }),
 
-  mounted() {
+  async mounted() {
+    this.rtcConnection = new RTCPeerConnection(null);
+
     // Grab elements, create settings, etc.
     this.camera = this.$refs.camera;
 
@@ -70,9 +73,26 @@ export default {
         .then((stream) => {
           // video.src = window.URL.createObjectURL(stream);
           this.camera.srcObject = stream;
+          this.cameraScream = stream;
           this.camera.play();
+          stream.getTracks().forEach((track) => {
+            this.rtcConnection.addTrack(track, stream);
+          });
         });
     }
+
+    this.rtcConnection.createOffer().then((offer) => this.rtcConnection.setLocalDescription(offer));
+
+    const offer = await this.rtcConnection.createOffer();
+    await this.rtcConnection.setLocalDescription(offer);
+
+    // eslint-disable-next-line no-console
+    console.log(offer);
+    this.wsSocket.send(JSON.stringify({
+      name: 'me',
+      rtc: true,
+      rtcOffer: offer,
+    }));
 
     // this.wsSocket = new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL);
 
@@ -111,6 +131,9 @@ export default {
         // eslint-disable-next-line no-console
         console.log('WS overloaded');
       }
+
+      // eslint-disable-next-line no-console
+      // console.log(this.cameraScream);
       // TODO this uses a lot of resources, probably need some sort of regulation
     }, 150);
   },
