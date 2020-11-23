@@ -17,20 +17,31 @@
       </div>
 
     </div>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-      <div class="col" v-if="wsSocket !== null">
-        <me-camera v-bind:username="yourName" v-bind:wsSocket="wsSocket"></me-camera>
-      </div>
-      <div class="col" v-for="user in users" :key="user.username">
-        <you-camera v-bind:username="user.username" v-bind:frame="user.frame" />
+<!--    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">-->
+<!--      <div class="col" v-if="wsSocket !== null">-->
+<!--        <me-camera v-bind:username="yourName" v-bind:wsSocket="wsSocket"></me-camera>-->
+<!--      </div>-->
+<!--      <div class="col" v-for="user in users" :key="user.username">-->
+<!--        <you-camera v-bind:username="user.username" v-bind:frame="user.frame" />-->
+<!--      </div>-->
+<!--    </div>-->
+    <div class="row">
+      <div class="col-4">
+        <div class="card">
+          <rtc-camera></rtc-camera>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+// adapter just makes sure that all webRTC function names are the same across all browsers
+// eslint-disable-next-line no-unused-vars
+import adapter from 'webrtc-adapter';
 import MeCamera from '../components/MeCamera.vue';
 import YouCamera from '../components/YouCamera.vue';
+import RtcCamera from '../components/rtcCamera.vue';
 
 const userDisconnectedStatus = -1;
 
@@ -57,7 +68,10 @@ export default {
   }),
 
   components: {
+    RtcCamera,
+    // eslint-disable-next-line vue/no-unused-components
     MeCamera,
+    // eslint-disable-next-line vue/no-unused-components
     YouCamera,
   },
 
