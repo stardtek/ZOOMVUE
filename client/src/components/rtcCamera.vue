@@ -1,16 +1,30 @@
 <template>
   <div>
-    Source
-    <video ref="source" muted>No video available</video>
-    Fake
-    <video ref="dest" autoplay>No video available</video>
-    <button v-on:click="loadRTCs">Load RTC</button>
+    <video ref="camera">No video available</video>
   </div>
 </template>
 
 <script>
 export default {
   name: 'rtcCamera',
+
+  props: [
+    /** @type {string} */
+    'you',
+
+    /** @type {string} */
+    'user',
+
+    /** @type {MediaStream} */
+    'cameraStream',
+
+    // 'offer' | 'answer'
+    /** @type {string} */
+    'rtcType',
+
+    /** @type {boolean} */
+    'isFirst',
+  ],
 
   data: () => ({
     servers: [
@@ -20,107 +34,155 @@ export default {
       'stun3.l.google.com:19302',
       'stun4.l.google.com:19302',
     ],
-    peer1: new RTCPeerConnection(/* {
-      iceServers: [
-        {
-          urls: 'stun:stun.l.google.com:19302',
-        },
-      ],
-    } */),
-    peer1CandidatesQueue: [],
+    rtcPeer: new RTCPeerConnection({
+      iceServers: [{
+        urls: [
+          'stun:stun.l.google.com:19302',
+          'stun:stun1.l.google.com:19302',
+          'stun:stun2.l.google.com:19302',
+          'stun:stun3.l.google.com:19302',
+          'stun:stun4.l.google.com:19302',
+        ],
+      }],
+    }),
+    rtcPeerCandidatesQueue: [],
 
-    peer2: new RTCPeerConnection(/* {
-      iceServers: [
-        {
-          urls: 'stun:stun.l.google.com:19302',
-        },
-      ],
-    } */),
-    peer2CandidatesQueue: [],
+    // peer2: new RTCPeerConnection(/* {
+    //   iceServers: [
+    //     {
+    //       urls: 'stun:stun.l.google.com:19302',
+    //     },
+    //   ],
+    // } */),
+    // peer2CandidatesQueue: [],
+
+    ws: new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL),
   }),
 
-  async mounted() {
-    // eslint-disable-next-line no-empty
-    while (this.$refs.source.readyState > 3) {}
+  // FIXME rtcPeer iceConnectionState is stuck in "checking"
+  // TODO try adding this to config https://hub.docker.com/r/instrumentisto/coturn
+  mounted() {
+    // eslint-disable-next-line no-console
+    console.log(this.rtcPeer);
 
-    // show users camera in video element
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      }).then((stream) => {
-        this.$refs.source.srcObject = stream;
-        this.$refs.source.play();
+    // we have to wait for camera to be defined before we can add stream
+    new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+        if (this.cameraStream !== null) {
+          clearTimeout(timeout);
+          resolve();
+        }
+      }, 100);
+    }).then(() => {
+      this.cameraStream.getTracks().forEach((track) => {
+        this.rtcPeer.addTrack(track, this.cameraStream);
+      });
+    });
 
-        stream.getTracks().forEach((track) => {
-          this.peer1.addTrack(track, stream);
+    this.ws.onopen = () => {
+      if (this.isFirst) {
+        this.ws.send(JSON.stringify({
+          from: this.you,
+          type: 'first-in',
+        }));
+      } else {
+        this.rtcPeer.createOffer({
+          offerToReceiveAudio: 1,
+          offerToReceiveVideo: 1,
+        }).then((offer) => {
+          this.rtcPeer.setLocalDescription(offer).then(() => {
+            this.sendOffer();
+          }).catch((error) => {
+            // eslint-disable-next-line no-console
+            console.log(error);
+          });
         });
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.log(error);
-      });
-    }
+      }
+    };
 
-    this.peer1.onicecandidate = (event) => {
-      if (!this.peer1 || !this.peer1.remoteDescription || !this.peer1.remoteDescription.type) {
-        this.peer1CandidatesQueue.push(event.candidate);
+    this.ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      switch (data.type) {
+        case 'offer':
+          // eslint-disable-next-line no-console
+          console.log(data.description);
+          this.rtcPeer.setRemoteDescription(data.description).then(() => {
+            this.rtcPeer.createAnswer().then((answer) => {
+              this.rtcPeer.setLocalDescription(answer).then(() => {
+                this.ws.send(JSON.stringify({
+                  from: this.you,
+                  to: data.from,
+                  type: 'answer',
+                  description: answer,
+                }));
+
+                // eslint-disable-next-line no-console
+                console.log('rtc answer sent');
+              });
+            });
+          });
+          break;
+
+        case 'answer':
+          this.rtcPeer.setRemoteDescription(data.description).then(() => {
+            // eslint-disable-next-line no-console
+            console.log('rtc should be done!!!');
+            // eslint-disable-next-line no-console
+            console.log(data.description);
+          }).catch((error) => {
+            // eslint-disable-next-line no-console
+            console.log(error);
+          });
+          break;
+
+        default:
+          break;
+      }
+    };
+
+    this.rtcPeer.onicecandidate = (event) => {
+      if (!this.rtcPeer || !this.rtcPeer.remoteDescription
+        || !this.rtcPeer.remoteDescription.type) {
+        this.rtcPeerCandidatesQueue.push(event.candidate);
         return;
       }
 
-      this.peer1.addIceCandidate(event.candidate).then(() => {
+      this.rtcPeer.addIceCandidate(event.candidate).then(() => {
         // eslint-disable-next-line no-console
-        console.log('peer1 added ice candidate');
+        console.log('rtcPeer added ice candidate');
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.log(error);
       });
     };
 
-    this.peer2.onicecandidate = (event) => {
-      if (!this.peer2 || !this.peer2.remoteDescription || !this.peer2.remoteDescription.type) {
-        this.peer2CandidatesQueue.push(event.candidate);
-        return;
-      }
-
-      this.peer2.addIceCandidate(event.candidate).then(() => {
-        // eslint-disable-next-line no-console
-        console.log('peer2 added ice candidate');
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.log(error);
-      });
-    };
-
-    this.peer2.ontrack = (event) => {
+    this.rtcPeer.ontrack = (event) => {
       if (event.streams.length === 0) {
         // eslint-disable-next-line no-console
         console.log('ontrack no stream available');
-        // eslint-disable-next-line no-console
-        console.log(event);
-      } else {
-        // eslint-disable-next-line prefer-destructuring
-        this.$refs.dest.srcObject = event.streams[0];
-        // eslint-disable-next-line no-console
-        console.log('stream added');
-        // eslint-disable-next-line no-console
-        console.log(event.streams[0]);
+        return;
       }
+
+      // eslint-disable-next-line prefer-destructuring
+      this.$refs.camera.srcObject = event.streams[0];
     };
 
     setInterval(() => {
       // eslint-disable-next-line no-console
-      console.log('peer1', this.peer1.connectionState);
+      console.log('rtcPeer', this.rtcPeer.connectionState);
       // eslint-disable-next-line no-console
-      console.log('peer2', this.peer2.connectionState);
+      console.log('ice state', this.rtcPeer.iceConnectionState);
 
-      // check for candicates in queue and add them to connection
-      if (this.peer1.connectionState === 'connecting' && this.peer1CandidatesQueue.length !== 0) {
-        this.peer1CandidatesQueue.forEach((candidate) => {
-          this.peer1.addIceCandidate(candidate).then(() => {
+      // check for candidates in queue and add them to connection
+      if ((this.rtcPeer.connectionState === 'new' || this.rtcPeer.connectionState === 'connecting')
+        && this.rtcPeerCandidatesQueue.length !== 0) {
+        this.rtcPeerCandidatesQueue.forEach((candidate) => {
+          this.rtcPeer.addIceCandidate(candidate).then(() => {
             // eslint-disable-next-line no-console
-            console.log('peer1 added ice candidate on state change');
+            console.log('rtcPeer added ice candidate on state change');
           }).then(() => {
-            this.peer1CandidatesQueue.length = 0;
+            this.rtcPeerCandidatesQueue.length = 0;
           }).catch((error) => {
             // eslint-disable-next-line no-console
             console.log(error);
@@ -128,48 +190,24 @@ export default {
         });
       }
 
-      if (this.peer2.connectionState === 'connecting' && this.peer2CandidatesQueue.length !== 0) {
-        this.peer2CandidatesQueue.forEach((candidate) => {
-          this.peer2.addIceCandidate(candidate).then(() => {
-            // eslint-disable-next-line no-console
-            console.log('peer2 added ice candidate on state change');
-          }).then(() => {
-            this.peer2CandidatesQueue.length = 0;
-          }).catch((error) => {
-            // eslint-disable-next-line no-console
-            console.log(error);
-          });
-        });
+      if (this.rtcPeer.connectionState !== 'connected' && this.you !== this.user) {
+        this.sendOffer();
       }
     }, 1000);
-
-    this.loadRTCs();
   },
 
   methods: {
-    loadRTCs() {
-      this.peer1.createOffer({
-        offerToReceiveAudio: 1,
-        offerToReceiveVideo: 1,
-      }).then((offer) => {
-        this.peer1.setLocalDescription(offer);
-        this.peer2.setRemoteDescription(this.peer1.localDescription).then(() => {
-          this.peer2.createAnswer().then((answer) => {
-            this.peer2.setLocalDescription(answer).then(() => {
-              this.peer1.setRemoteDescription(this.peer2.localDescription).then(() => {
-                // eslint-disable-next-line no-console
-                console.log('rtc should be done!!!');
-              }).catch((error) => {
-                // eslint-disable-next-line no-console
-                console.log(error);
-              });
-            });
-          });
-        }).catch((error) => {
-          // eslint-disable-next-line no-console
-          console.log(error);
-        });
-      });
+    sendOffer() {
+      this.ws.send(JSON.stringify({
+        from: this.you,
+        to: this.user,
+        type: 'offer',
+        description: this.rtcPeer.localDescription,
+      }));
+      // eslint-disable-next-line no-console
+      console.log('rtc offer sent');
+      // eslint-disable-next-line no-console
+      console.log(this.rtcPeer.localDescription);
     },
   },
 };

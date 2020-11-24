@@ -1,35 +1,40 @@
 <template>
   <div class="container-fluid">
-    <div id="nav">
-      <router-link id="logo" to="/">
-        <img src="@/assets/logo2_1.png" width="80" alt="LOGO"/></router-link>
-      | <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link> |
-      <div v-if="logedStatus == false">
-      <router-link to="/login">Login</router-link> |
-      <router-link to="/register">Register</router-link> |
-      </div>
-      <div v-if="logedStatus == true">
-        <form @submit.prevent="logout">
-          <button type="submit" >Logout</button>
-          <router-link to="/conference">Conference</router-link> |
-      </form>
-      </div>
-
-    </div>
-<!--    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">-->
-<!--      <div class="col" v-if="wsSocket !== null">-->
-<!--        <me-camera v-bind:username="yourName" v-bind:wsSocket="wsSocket"></me-camera>-->
-<!--      </div>-->
-<!--      <div class="col" v-for="user in users" :key="user.username">-->
-<!--        <you-camera v-bind:username="user.username" v-bind:frame="user.frame" />-->
-<!--      </div>-->
-<!--    </div>-->
     <div class="row">
-      <div class="col-4">
-        <div class="card">
-          <rtc-camera></rtc-camera>
+      <div class="col">
+        <div id="nav">
+          <router-link id="logo" to="/">
+            <img src="@/assets/logo2_1.png" width="80" alt="LOGO"/></router-link>
+          | <router-link to="/">Home</router-link> |
+          <router-link to="/about">About</router-link> |
+          <div v-if="logedStatus === false">
+          <router-link to="/login">Login</router-link> |
+          <router-link to="/register">Register</router-link> |
+          </div>
+          <div v-if="logedStatus === true">
+            <form @submit.prevent="logout">
+              <button type="submit" >Logout</button>
+              <router-link to="/conference">Conference</router-link> |
+          </form>
+          </div>
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <h1 style="color: red">{{ yourName }}</h1>
+      </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+      <div class="col">
+        <video ref="youCamera" autoplay muted></video>
+      </div>
+      <div class="col"  v-for="user in users" :key="user.username">
+        <rtc-camera v-bind:you="yourName"
+                    v-bind:user="user.username"
+                    v-bind:is-first="user.isFirst"
+                    v-bind:cameraStream="cameraStream"
+        ></rtc-camera>
       </div>
     </div>
   </div>
@@ -39,10 +44,9 @@
 // adapter just makes sure that all webRTC function names are the same across all browsers
 // eslint-disable-next-line no-unused-vars
 import adapter from 'webrtc-adapter';
-import MeCamera from '../components/MeCamera.vue';
-import YouCamera from '../components/YouCamera.vue';
 import RtcCamera from '../components/rtcCamera.vue';
 
+// eslint-disable-next-line no-unused-vars
 const userDisconnectedStatus = -1;
 
 export default {
@@ -58,70 +62,73 @@ export default {
      *
      * {
      *   username: string,
-     *   frame: string -> imgDataURL, users video frame data | -1 means user disconnected
+     *   isFirst: boolean, default false, defines first user in chat so connection can begin
      * }
      *
      */
     users: [],
-    wsSocket: null,
-    rtcConnection: new RTCPeerConnection(null),
+    ws: new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL),
+    cameraStream: null,
   }),
 
   components: {
     RtcCamera,
-    // eslint-disable-next-line vue/no-unused-components
-    MeCamera,
-    // eslint-disable-next-line vue/no-unused-components
-    YouCamera,
   },
 
   mounted() {
-    // this.rtcConnection = new RTCPeerConnection(null);
-    this.wsSocket = new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL);
+    // Get access to the camera!
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      }).then((stream) => {
+        this.$refs.youCamera.srcObject = stream;
+        this.$refs.youCamera.play();
+        this.cameraScream = stream;
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.log(error);
+      });
+    }
 
     // Connection opened
-    this.wsSocket.addEventListener('open', () => {
+    this.ws.onopen = () => {
       // eslint-disable-next-line no-console
       console.log('Websocket opened from conference!!!');
-    });
+
+      // request all other connected clients
+      this.ws.send(JSON.stringify({
+        type: 'get-all-users',
+      }));
+    };
 
     // Listen for messages
-    this.wsSocket.addEventListener('message', async (event) => {
+    this.ws.onmessage = (event) => {
       // Load users video frame
       // eslint-disable-next-line no-unused-vars
       const data = JSON.parse(event.data);
+      if (!data.type) return;
 
-      if (data.rtcOffer) {
-        // eslint-disable-next-line no-console
-        console.log('offer', data.rtcOffer);
-        await this.rtcConnection.setRemoteDescription(data.rtcOffer);
-        // eslint-disable-next-line no-console
-        console.log(this.rtcConnection);
-        const answer = await this.rtcConnection.createAnswer();
-        this.wsSocket.send(JSON.stringify({
-          name: 'you',
-          rtc: true,
-          rtcOffer: answer,
-        }));
-        return;
+      switch (data.type) {
+        case 'get-all-users-response':
+          if (data.users && data.users.length === 0) {
+            this.users.push({
+              username: this.yourName,
+              isFirst: true,
+            });
+          }
+
+          data.users.forEach((user) => {
+            this.users.push({
+              username: user,
+            });
+          });
+          break;
+
+        default:
+          break;
       }
-
-      // ignore empty messages or messages with missing data
-      if (!data || !data.username || !data.frame) return;
-
-      const userIndex = this.users.findIndex((user) => user.username === data.username);
-
-      if (data.frame === userDisconnectedStatus && userIndex !== -1) {
-        // remove disconnected user from grid
-        this.users.splice(userIndex, 1);
-      } else if (userIndex === -1) {
-        // new user joined
-        this.users.push(data);
-      } else {
-        // refresh users image
-        this.users[userIndex].frame = data.frame;
-      }
-    });
+    };
   },
   computed: {
     logedStatus: () => {
@@ -143,6 +150,11 @@ export default {
 <style>
 .container-fluid {
   background-color: #2c3e50;
+}
+
+video {
+  width: 100%;
+  height: auto;
 }
 
 </style>
