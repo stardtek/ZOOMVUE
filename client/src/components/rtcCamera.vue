@@ -1,6 +1,13 @@
 <template>
-  <div>
-    <video ref="camera">No video available</video>
+  <div class="row">
+    <div class="col">
+      <div class="card mb-3">
+        <video ref="camera" autoplay>No video available</video>
+        <div class="card-body">
+          <h5 class="card-title">{{ isFirst ? firstJoinedUser : user }}</h5>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -9,9 +16,11 @@ export default {
   name: 'rtcCamera',
 
   props: [
+    // your username
     /** @type {string} */
     'you',
 
+    // remote users username
     /** @type {string} */
     'user',
 
@@ -22,48 +31,71 @@ export default {
     /** @type {string} */
     'rtcType',
 
+    // someone has to be first so other users have someone to connect to
     /** @type {boolean} */
     'isFirst',
   ],
 
   data: () => ({
-    servers: [
-      'stun.l.google.com:19302',
-      'stun1.l.google.com:19302',
-      'stun2.l.google.com:19302',
-      'stun3.l.google.com:19302',
-      'stun4.l.google.com:19302',
-    ],
+    /**
+     * Data format send thru websocket to establish RTC connection
+     * {
+     *   from: string - caller,
+     *   to: string - called,
+     *   type: 'answer',
+     *   description: RTC localDescription
+     * }
+     */
+
     rtcPeer: new RTCPeerConnection({
-      iceServers: [{
-        urls: [
-          'stun:stun.l.google.com:19302',
-          'stun:stun1.l.google.com:19302',
-          'stun:stun2.l.google.com:19302',
-          'stun:stun3.l.google.com:19302',
-          'stun:stun4.l.google.com:19302',
-        ],
-      }],
+      iceServers: [
+        {
+          // STUN servers are needed to establish connection via public IPs
+          urls: [
+            'stun:stun.l.google.com:19302',
+            'stun:stun1.l.google.com:19302',
+            'stun:stun2.l.google.com:19302',
+            'stun:stun3.l.google.com:19302',
+            'stun:stun4.l.google.com:19302',
+          ],
+        },
+      ],
     }),
+
+    // sometimes RTC try to add Ice Candidates before remote user is set
+    // this triggers error in Chrome, so we queue those candidates and add then later
+    // when remote user is set
     rtcPeerCandidatesQueue: [],
 
-    // peer2: new RTCPeerConnection(/* {
-    //   iceServers: [
-    //     {
-    //       urls: 'stun:stun.l.google.com:19302',
-    //     },
-    //   ],
-    // } */),
-    // peer2CandidatesQueue: [],
-
     ws: new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL),
+
+    // username of second person to join the conference, we get it later because first user
+    // does not know remote users name so add it after connection
+    // this is only used if isFirst == true
+    /** @type {string} */
+    firstJoinedUser: '',
   }),
 
-  // FIXME rtcPeer iceConnectionState is stuck in "checking"
-  // TODO try adding this to config https://hub.docker.com/r/instrumentisto/coturn
   mounted() {
     // eslint-disable-next-line no-console
     console.log(this.rtcPeer);
+
+    // Get access to the camera!
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      }).then((stream) => {
+        stream.getTracks().forEach((track) => {
+          this.rtcPeer.addTrack(track, stream);
+          // eslint-disable-next-line no-console
+          console.log(stream);
+        });
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.log(error);
+      });
+    }
 
     // we have to wait for camera to be defined before we can add stream
     new Promise((resolve) => {
@@ -72,31 +104,27 @@ export default {
           clearTimeout(timeout);
           resolve();
         }
+        // eslint-disable-next-line no-console
+        console.log('waiting for camera stream ):(');
       }, 100);
     }).then(() => {
       this.cameraStream.getTracks().forEach((track) => {
         this.rtcPeer.addTrack(track, this.cameraStream);
+        // eslint-disable-next-line no-console
+        console.log(this.cameraStream);
       });
     });
 
     this.ws.onopen = () => {
+      // first user have to check in so other have someone to connect to
       if (this.isFirst) {
         this.ws.send(JSON.stringify({
           from: this.you,
           type: 'first-in',
         }));
       } else {
-        this.rtcPeer.createOffer({
-          offerToReceiveAudio: 1,
-          offerToReceiveVideo: 1,
-        }).then((offer) => {
-          this.rtcPeer.setLocalDescription(offer).then(() => {
-            this.sendOffer();
-          }).catch((error) => {
-            // eslint-disable-next-line no-console
-            console.log(error);
-          });
-        });
+        // start connection with remote user
+        this.sendOffer();
       }
     };
 
@@ -104,26 +132,19 @@ export default {
       const data = JSON.parse(event.data);
 
       switch (data.type) {
+        // offer came from remote user, send back RTC answer
         case 'offer':
           // eslint-disable-next-line no-console
           console.log(data.description);
           this.rtcPeer.setRemoteDescription(data.description).then(() => {
-            this.rtcPeer.createAnswer().then((answer) => {
-              this.rtcPeer.setLocalDescription(answer).then(() => {
-                this.ws.send(JSON.stringify({
-                  from: this.you,
-                  to: data.from,
-                  type: 'answer',
-                  description: answer,
-                }));
-
-                // eslint-disable-next-line no-console
-                console.log('rtc answer sent');
-              });
-            });
+            this.sendAnswer(data);
+          }).catch((error) => {
+            // eslint-disable-next-line no-console
+            console.log(error);
           });
           break;
 
+        // answer came from remote user, confirm connection with remote user
         case 'answer':
           this.rtcPeer.setRemoteDescription(data.description).then(() => {
             // eslint-disable-next-line no-console
@@ -142,6 +163,8 @@ export default {
     };
 
     this.rtcPeer.onicecandidate = (event) => {
+      // this needs to wait for remote user to be set before you add candidates
+      // otherwise Chrome throw errors
       if (!this.rtcPeer || !this.rtcPeer.remoteDescription
         || !this.rtcPeer.remoteDescription.type) {
         this.rtcPeerCandidatesQueue.push(event.candidate);
@@ -157,6 +180,7 @@ export default {
       });
     };
 
+    // we got video/audio from remote user
     this.rtcPeer.ontrack = (event) => {
       if (event.streams.length === 0) {
         // eslint-disable-next-line no-console
@@ -168,13 +192,14 @@ export default {
       this.$refs.camera.srcObject = event.streams[0];
     };
 
+    // TODO this interval should be stopped when camera connection succeeds
     setInterval(() => {
       // eslint-disable-next-line no-console
       console.log('rtcPeer', this.rtcPeer.connectionState);
       // eslint-disable-next-line no-console
       console.log('ice state', this.rtcPeer.iceConnectionState);
 
-      // check for candidates in queue and add them to connection
+      // check for Ice Candidates in queue and add them to connection
       if ((this.rtcPeer.connectionState === 'new' || this.rtcPeer.connectionState === 'connecting')
         && this.rtcPeerCandidatesQueue.length !== 0) {
         this.rtcPeerCandidatesQueue.forEach((candidate) => {
@@ -190,24 +215,70 @@ export default {
         });
       }
 
-      if (this.rtcPeer.connectionState !== 'connected' && this.you !== this.user) {
+      // first user in conference does not have remote user name and please don't try
+      // to establish RTC connection with yourself
+      if (this.you !== this.user) {
+        // for whatever reason offer <-> answer needs to happen a few times...
         this.sendOffer();
       }
-    }, 1000);
+    }, 5000);
   },
 
   methods: {
+    /**
+     * Send RTC offer to remote user
+     */
     sendOffer() {
-      this.ws.send(JSON.stringify({
-        from: this.you,
-        to: this.user,
-        type: 'offer',
-        description: this.rtcPeer.localDescription,
-      }));
-      // eslint-disable-next-line no-console
-      console.log('rtc offer sent');
-      // eslint-disable-next-line no-console
-      console.log(this.rtcPeer.localDescription);
+      this.rtcPeer.createOffer({
+        offerToReceiveAudio: 1,
+        offerToReceiveVideo: 1,
+      }).then((offer) => {
+        this.rtcPeer.setLocalDescription(offer).then(() => {
+          // eslint-disable-next-line no-console
+          console.log(this.rtcPeer.localDescription);
+          this.ws.send(JSON.stringify({
+            from: this.you,
+            to: this.user,
+            type: 'offer',
+            description: this.rtcPeer.localDescription,
+          }));
+          // eslint-disable-next-line no-console
+          console.log('rtc offer sent');
+        }).catch((error) => {
+          // eslint-disable-next-line no-console
+          console.log(error);
+        });
+      });
+    },
+
+    /**
+     * Send RTC answer to remote user
+     * @param data JSON data from remote user
+     */
+    sendAnswer(data) {
+      this.rtcPeer.createAnswer().then((answer) => {
+        this.rtcPeer.setLocalDescription(answer).then(() => {
+          this.ws.send(JSON.stringify({
+            from: this.you,
+            to: data.from,
+            type: 'answer',
+            description: answer,
+          }));
+
+          // first user in conference does not know remote users name so add it here
+          // eslint-disable-next-line vue/no-mutating-props
+          if (this.isFirst) this.firstJoinedUser = data.from;
+
+          // eslint-disable-next-line no-console
+          console.log('rtc answer sent');
+        }).catch((error) => {
+          // eslint-disable-next-line no-console
+          console.log(error);
+        });
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.log(error);
+      });
     },
   },
 };

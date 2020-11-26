@@ -95,7 +95,6 @@ export default {
     this.ws.onopen = () => {
       // eslint-disable-next-line no-console
       console.log('Websocket opened from conference!!!');
-
       // request all other connected clients
       this.ws.send(JSON.stringify({
         type: 'get-all-users',
