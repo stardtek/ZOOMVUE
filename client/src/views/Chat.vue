@@ -2,78 +2,61 @@
   <div>
     <div id="nav">
         <router-link id="logo" to="/">
-          <img src="@/assets/logo2_1.png" width="80" alt="LOGO"/></router-link>
+        <img src="@/assets/logo2.jpg" width="80" alt="LOGO"/></router-link>
         | <router-link to="/">Home</router-link> |
         <router-link to="/about">About</router-link> |
+        <router-link to="/chat">Chat</router-link> |
         <div v-if="logedStatus == false">
         <router-link to="/login">Login</router-link> |
         <router-link to="/register">Register</router-link> |
-        </div>
-        <div v-if="logedStatus == true">
-          <form @submit.prevent="logout">
-            <button type="submit" >Logout</button>
-            <router-link to="/conference">Conference</router-link> |
-        </form>
-        </div>
+    </div>
 
+      <div v-if="logedStatus == true">
+        <form @submit.prevent="logout">
+          <button type="submit" >Logout</button>
+      </form>
       </div>
+    </div>
     <div class="container-fluid">
-
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
         <div class="col" v-if="wsSocket !== null">
-          <me-camera v-bind:username="logedName" v-bind:wsSocket="wsSocket"></me-camera>
+          <chatWin v-bind:username="logedName" v-bind:wsSocket="wsSocket"></chatWin>
         </div>
-        <div class="col" v-for="user in users" :key="user.username">
-          <you-camera v-bind:username="user.username" v-bind:frame="user.frame" />
-        </div>
-      </div>
+
     </div>
   </div>
 </template>
 
 <script>
 /* eslint-disable prefer-template */
-import MeCamera from '../components/MeCamera.vue';
-import YouCamera from '../components/YouCamera.vue';
+/* eslint-disable no-console */
+/* eslint-disable max-len */
+
+import chatWin from '../components/TextWindow.vue';
 
 const userDisconnectedStatus = -1;
 
 export default {
-  name: 'conference',
+  name: 'chat',
 
   data: () => ({
-    // TODO get username from session //DONE
 
-    // yourName: this.logedName,
-
-    /**
-     * Expected user format
-     *
-     * {
-     *   username: string,
-     *   frame: string -> imgDataURL, users video frame data | -1 means user disconnected
-     * }
-     *
-     */
     users: [],
     wsSocket: null,
   }),
 
   components: {
-    MeCamera,
-    YouCamera,
+    chatWin,
+
   },
 
   mounted() {
-    this.wsSocket = new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL);
+    this.wsSocket = new WebSocket(process.env.VUE_APP_CHAT_WS_URL);
 
     // Connection opened
     this.wsSocket.addEventListener('open', () => {
       // eslint-disable-next-line no-console
-      console.log('Websocket opened from conference!!!');
+      console.log('Websocket opened from chat!!!');
     });
-
-    // Listen for messages
     this.wsSocket.addEventListener('message', (event) => {
       // Load users video frame
       // eslint-disable-next-line no-unused-vars
@@ -92,7 +75,8 @@ export default {
         this.users.push(data);
       } else {
         // refresh users image
-        this.users[userIndex].frame = data.frame;
+        // this.users[userIndex].frame = data.frame;
+        console.log(data);
       }
     });
   },

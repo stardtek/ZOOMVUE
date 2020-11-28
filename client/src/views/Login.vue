@@ -2,9 +2,10 @@
   <div>
     <div id="nav">
       <router-link id="logo" to="/">
-        <img src="@/assets/logo2_1.png" width="80" alt="LOGO"/></router-link>
+        <img src="@/assets/logo2.jpg" width="80" alt="LOGO"/></router-link>
       | <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> |
+      <router-link to="/chat">Chat</router-link> |
       <div v-if="logedStatus == false">
       <router-link to="/login">Login</router-link> |
       <router-link to="/register">Register</router-link> |

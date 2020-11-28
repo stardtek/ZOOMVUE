@@ -5,6 +5,7 @@
         <img src="@/assets/logo2.jpg" width="80" alt="LOGO"/></router-link>
       | <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> |
+      <router-link to="/chat">Chat</router-link> |
       <div v-if="logedStatus == false">
       <router-link to="/login">Login</router-link> |
       <router-link to="/register">Register</router-link> |

@@ -45,6 +45,9 @@ session.username=[];
 const conference = require('./routes/conference');
 app.use('/conference', conference);
 
+const chat = require('./routes/chat');
+app.use('/chat', chat);
+
 // TODO move these endpoints into appropriate routes
 // https://www.tutorialspoint.com/expressjs/expressjs_routing.htm
 app.get("/", (req, res) => {

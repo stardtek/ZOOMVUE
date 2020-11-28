@@ -31,6 +31,11 @@ const routes = [
     name: 'Conference',
     component: Conference,
   },
+  {
+    path: '/chat',
+    name: 'Chat',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Chat.vue'),
+  },
 ];
 
 const router = createRouter({
