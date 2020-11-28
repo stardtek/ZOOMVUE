@@ -68,7 +68,7 @@
         />
       </div>
 
-      <button type="submit" class="btn btn-primary">Add Message</button>
+      <button type="submit" class="btn btn-primary">Register</button>
     </form>
   </div>
 </template>
