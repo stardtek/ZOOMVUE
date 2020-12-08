@@ -7,15 +7,16 @@
         | <router-link to="/">Home</router-link> |
         <router-link to="/about">About</router-link> |
         <router-link to="/chat">Chat</router-link> |
+        <router-link to="/private">private</router-link> |
         <div v-if="logedStatus == false">
-        <router-link to="/login">Login</router-link> |
-        <router-link to="/register">Register</router-link> |
-    </div>
+            <router-link to="/login">Login</router-link> |
+            <router-link to="/register">Register</router-link> |
+        </div>
 
       <div v-if="logedStatus == true">
         <form @submit.prevent="logout">
           <button type="submit" >Logout</button>
-      </form>
+        </form>
       </div>
     </div>
     <h1 id="welcome">Welcome to Hogs sallon!</h1>

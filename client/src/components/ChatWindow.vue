@@ -1,24 +1,13 @@
 <template>
   <div class="card mt-3">
-    <div class="active-users">
-      <div>
-        <h3>Active users: </h3>
-        <div ref="usersDiv" v-for="(user, indexUsers) in users" :key="indexUsers">
-
-          <ul>
-            <li><span class="font-weight-bold">{{ user }}</span></li>
-          </ul>
-        </div>
-      </div>
-    </div>
             <div class="card-body">
                 <div class="card-title">
-                    <h3>Chat Group</h3>
+                    <h3>Chat</h3>
                     <hr>
                 </div>
-                <div class="card-body">
+                <div class="card-body1">
                     <div class="messages" v-for="(msg, index) in messages" :key="index">
-                        <p><span class="font-weight-bold">{{ msg.username }}:
+                        <p><span class="font-weight-bold">{{ msg.from }}:
                             </span>{{ msg.message }}</p>
                     </div>
                 </div>
@@ -26,10 +15,7 @@
             <div class="card-footer">
 
                 <form>
-                    <div class="gorm-group">
-                        <label for="user">User:</label>
-                        <h2>{{ logedName }}</h2>
-                    </div>
+
                     <div class="gorm-group pb-3">
                         <label for="message">Message:</label>
                         <input ref="newMessage" type="text" class="form-control">
@@ -42,14 +28,14 @@
 </template>
 
 <script>
+// import { query } from 'express';
 
 /*
 <div v-for="(user, index) in users" :key="index">
           <p><span class="font-weight-bold">{{ user.username }}</span></p>
       </div>
 */
-
-// TODO add room number with send message for server to know who to send to
+const API_URL_GETMSGS = 'http://localhost:4000/getUsermessages';
 
 export default {
   /* eslint-disable no-console */
@@ -61,12 +47,29 @@ export default {
   ],
 
   data: () => ({
-    WebSocket: new WebSocket(process.env.VUE_APP_CHAT_WS_URL),
+    WebSocket: new WebSocket(process.env.VUE_APP_PRIVATE_CHAT_WS_URL),
     messages: [],
     users: [],
+    names: {
+      too: '',
+      from: '',
+    },
   }),
 
   mounted() {
+    this.names.from = this.logedName;
+    this.names.too = this.$route.params.id;
+    fetch(API_URL_GETMSGS, {
+      method: 'POST',
+      body: JSON.stringify(this.names),
+      headers: { 'content-type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result);
+        console.log(' this si result');
+        this.messages = result;
+      });
     // eslint-disable-next-line no-unused-vars
     this.WebSocket.onopen = (event) => {
       // eslint-disable-next-line no-console
@@ -81,7 +84,7 @@ export default {
       // eslint-disable-next-line no-console
       // console.log('message get ', event);
       const data = JSON.parse(event.data);
-      console.log(data, 'data');
+      console.log(data);
       if (data.disconected) {
         console.log('Izbriše');
         for (let i = 0; i < this.users.length; i += 1) {
@@ -109,12 +112,28 @@ export default {
     // eslint-disable-next-line no-unused-vars
     send(event) {
       const data = JSON.stringify({
-        username: this.logedName,
+        from: this.logedName,
         message: this.$refs.newMessage.value,
-        group: this.$route.params.id,
+        to: this.names.too,
       });
       this.$refs.newMessage.value = '';
       this.WebSocket.send(data);
+    },
+
+    getPAram() {
+      this.names.from = this.logedName;
+      this.names.too = this.$route.params.id;
+      fetch(API_URL_GETMSGS, {
+        method: 'POST',
+        body: JSON.stringify(this.names),
+        headers: { 'content-type': 'application/json' },
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          this.messages = result;
+          console.log(this.messages);
+          console.log(' this si messages');
+        });
     },
 
   },
@@ -131,11 +150,28 @@ export default {
       if (localStorage.getItem('user')) {
         return localStorage.getItem('user');
       }
-
       // eslint-disable-next-line prefer-template
-      const rand = 'Random cunt ' + Math.floor(Math.random() * 100);
+      const rand = 'Random user ' + Math.floor(Math.random() * 100);
       return rand;
     },
+    update: () => {
+      fetch(API_URL_GETMSGS, {
+        method: 'POST',
+        body: JSON.stringify(this.names),
+        headers: { 'content-type': 'application/json' },
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          console.log(result);
+          console.log(' this si result');
+          this.messages = result;
+        });
+    },
+  },
+  watch: {
+    // when redirect to new category_name, this will be callback
+    $route: 'getPAram',
+
   },
 
 };
@@ -149,5 +185,4 @@ export default {
     overflow: auto;
     height: 50vh;
   }
-
 </style>

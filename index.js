@@ -48,8 +48,12 @@ app.use('/conference', conference);
 const chat = require('./routes/chat');
 app.use('/chat', chat);
 
+const privateChat = require('./routes/privateChat');
+app.use('/privateChat', privateChat);
+
 // TODO move these endpoints into appropriate routes
 // https://www.tutorialspoint.com/expressjs/expressjs_routing.htm
+
 app.get("/", (req, res) => {
   res.json({
     message: "Behold The MEVN Stack!",
@@ -98,7 +102,7 @@ app.get("/allUsers", (req, res) => {
 });
 
 app.post("/login",  async (req,res) =>{
-  var TF = await users.findUser(req.body);
+  var TF = await users.findUser(req.body) ;
   console.log(TF);
   if (TF) {
     console.log("session");
@@ -113,6 +117,18 @@ app.post("/login",  async (req,res) =>{
 app.get('/session', function(req,res){
   res.send(session.username );
   console.log(session.username ) ;
+});
+
+app.get('/usernames', function(req,res){
+  users.getUsernames().then((usernames) => {
+    res.json(usernames);
+  });
+});
+app.post('/getUsermessages', function(req,res){
+  console.log(req.body);
+  messages.getMessages(req.body).then((mess) => {
+    res.json(mess);
+  });
 });
 
 

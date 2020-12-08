@@ -6,37 +6,29 @@
         | <router-link to="/">Home</router-link> |
         <router-link to="/about">About</router-link> |
         <router-link to="/chat">Chat</router-link> |
+        <router-link to="/private">private</router-link> |
         <div v-if="logedStatus == false">
-        <router-link to="/login">Login</router-link> |
-        <router-link to="/register">Register</router-link> |
-    </div>
+            <router-link to="/login">Login</router-link> |
+            <router-link to="/register">Register</router-link> |
+        </div>
 
       <div v-if="logedStatus == true">
         <form @submit.prevent="logout">
           <button type="submit" >Logout</button>
-      </form>
+        </form>
       </div>
     </div>
     <div class="container-fluid">
-        <div class="col" v-if="wsSocket !== null && query">
+        <div class="userLinks" v-for="(msg, index) in users" :key="index">
+            <router-link :to="{name:'privateId', params: {id: msg.username} }">
+              <span class="font-weight-bold">{{ msg.username }}:
+                </span></router-link>
+        </div>
+        <div><h3>{{ query }}</h3></div>
+        <div>
+          <div class="col" v-if="wsSocket !== null && query">
           <chatWin v-bind:username="logedName" v-bind:wsSocket="wsSocket"></chatWin>
         </div>
-
-        <div class="col" v-else>
-          <form @submit.prevent="roomSelect">
-            <div class="form-group">
-              <label for="roomId">Room</label>
-              <input
-                v-model="room"
-                class="form-control"
-                type="test"
-                placeholder="Enter room Id"
-                id="message"
-              />
-            </div>
-
-            <button type="submit" class="btn btn-primary">Login</button>
-          </form>
         </div>
 
     </div>
@@ -48,19 +40,26 @@
 /* eslint-disable no-console */
 /* eslint-disable max-len */
 
-import chatWin from '../components/TextWindow.vue';
+import chatWin from '../components/ChatWindow.vue';
 
+// eslint-disable-next-line no-unused-vars
+const API_URL_USERNAMES = 'http://localhost:4000/usernames';
+// const API_URL_GETMSGS = 'http://localhost:4000/getUsermessages';
 const userDisconnectedStatus = -1;
 
 export default {
-  name: 'chat',
+  name: 'privateChat',
 
   data: () => ({
-    room: '',
-
     users: [],
     wsSocket: null,
     query: '',
+
+    names: {
+      too: '',
+      from: '',
+    },
+
   }),
 
   components: {
@@ -68,9 +67,22 @@ export default {
 
   },
 
-  mounted() {
+  mounted: function mounted() {
+    // fetch all usernames
     this.getPAram();
-    this.wsSocket = new WebSocket(process.env.VUE_APP_CHAT_WS_URL);
+    fetch(API_URL_USERNAMES, {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result);
+        console.log(' this si result');
+        this.users = result;
+      });
+    console.log(this.$route.params.id);
+
+    this.wsSocket = new WebSocket(process.env.VUE_APP_PRIVATE_CHAT_WS_URL);
+    // this.users = API_URL_LOG;
 
     // Connection opened
     this.wsSocket.addEventListener('open', () => {
@@ -101,6 +113,7 @@ export default {
     });
   },
   computed: {
+
     logedStatus: () => {
       if (localStorage.getItem('user')) {
         return true;
@@ -116,16 +129,17 @@ export default {
       const rand = 'Random cunt ' + Math.floor(Math.random() * 100);
       return rand;
     },
+    getUsernames() {
+      return ['test', 'test', 'test'];
+    },
   },
   methods: {
-    roomSelect() {
-      console.log('yes');
-      this.$router.push({ name: 'ChatId', params: { id: this.room } });
-      this.$forceUpdate();
-    },
     getPAram() {
       this.query = this.$route.params.id;
       // this.$forceUpdate();
+    },
+    update() {
+      this.$forceUpdate();
     },
     logout() {
       localStorage.removeItem('user');
@@ -137,6 +151,7 @@ export default {
     $route: 'getPAram',
 
   },
+
 };
 </script>
 

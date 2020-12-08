@@ -110,8 +110,8 @@ export default {
             this.showMessageForm = false;
             this.error = "";
             this.succe = result.ok;
+            this.$router.push("/login");
           }
-          this.$router.push("/about");
         });
     },
   },

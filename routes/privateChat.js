@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
+const messagesDB = require("../db/messages");
 // all users connected to this endpoint
 let clients = [];
 
@@ -14,26 +14,27 @@ router.ws('/', (ws) => {
 
   ws.on('message', (msg) => {
     // broadcast frame to all connected clients
-    clients.forEach((client) => {
-      const msgData = JSON.parse(msg);
+    messagesDB.save( JSON.parse(msg));
+    /* clients.forEach((client) => {
+        try {
+          if (client.bufferedAmount === 0) {
+            client.send(msg);
+          } else {
+            console.log('WS overloaded, skipped this message');
+          }
+        } catch {
+          console.log('Error: Tried to send message to disconnected client...');
+        }
       if (!client.username) {
         // add username to each socket, so we can tell later which user disconnected
+        const msgData = JSON.parse(msg);
         if (msgData.username) {
           client.username = msgData.username;
-          client.group = msgData.group;
-          console.log(client.username+ " " + client.group + " : "+msgData.message);
+          console.log(client.username + " : "+msgData.message);
         }
-      }
-      try {
-        if (client.bufferedAmount === 0 && msgData.group === client.group) {
-          client.send(msg);
-        } else {
-          console.log('WS overloaded, skipped this message');
-        }
-      } catch {
-        console.log('Error: Tried to send message to disconnected client...');
       }
     });
+    */
   });
 
   ws.on('close', () => {

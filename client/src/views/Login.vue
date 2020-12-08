@@ -7,8 +7,8 @@
       <router-link to="/about">About</router-link> |
       <router-link to="/chat">Chat</router-link> |
       <div v-if="logedStatus == false">
-      <router-link to="/login">Login</router-link> |
-      <router-link to="/register">Register</router-link> |
+        <router-link to="/login">Login</router-link> |
+        <router-link to="/register">Register</router-link> |
       </div>
       <div v-if="logedStatus == true">
         <form @submit.prevent="logout">
@@ -100,6 +100,9 @@ export default {
     forceRerender() {
       this.componentKey += 1;
     },
+    getPAram() {
+
+    },
   },
   computed: {
     logedStatus: () => {
@@ -107,6 +110,10 @@ export default {
         return true;
       }
       return false;
+    },
+    watch: {
+    // when redirect to new category_name, this will be callback
+      $route: "getPAram",
     },
   },
 };
