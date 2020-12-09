@@ -53,9 +53,9 @@ export default {
   name: 'conference',
 
   data: () => ({
-    // TODO get username from session
+    // TODO get username from session //DONE
 
-    yourName: Math.random() * 1000,
+    // yourName: this.logedName,
 
     /**
      * Expected user format
@@ -137,10 +137,19 @@ export default {
       return false;
     },
     logedName: () => {
+      // console.log('pride sm');
       if (localStorage.getItem('user')) {
         return localStorage.getItem('user');
       }
-      return Math.random() * 1000;
+
+      const rand = 'Random cunt ' + Math.floor(Math.random() * 100);
+      return rand;
+    },
+  },
+  methods: {
+    logout() {
+      localStorage.removeItem('user');
+      this.$router.push('/login');
     },
   },
 };

@@ -2,12 +2,13 @@
   <div>
     <div id="nav">
       <router-link id="logo" to="/">
-        <img src="@/assets/logo2_1.png" width="80" alt="LOGO"/></router-link>
+        <img src="@/assets/logo2.jpg" width="80" alt="LOGO"/></router-link>
       | <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> |
+      <router-link to="/chat">Chat</router-link> |
       <div v-if="logedStatus == false">
-      <router-link to="/login">Login</router-link> |
-      <router-link to="/register">Register</router-link> |
+        <router-link to="/login">Login</router-link> |
+        <router-link to="/register">Register</router-link> |
       </div>
       <div v-if="logedStatus == true">
         <form @submit.prevent="logout">
@@ -48,7 +49,7 @@
         />
       </div>
 
-      <button type="submit" class="btn btn-primary">Add Message</button>
+      <button type="submit" class="btn btn-primary">Login</button>
     </form>
   </div>
 </template>
@@ -99,6 +100,9 @@ export default {
     forceRerender() {
       this.componentKey += 1;
     },
+    getPAram() {
+
+    },
   },
   computed: {
     logedStatus: () => {
@@ -106,6 +110,10 @@ export default {
         return true;
       }
       return false;
+    },
+    watch: {
+    // when redirect to new category_name, this will be callback
+      $route: "getPAram",
     },
   },
 };

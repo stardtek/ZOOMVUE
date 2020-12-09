@@ -1,0 +1,3 @@
+https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
+https://vuejs.org/v2/guide/events.html
+https://www.npmjs.com/package/express-ws

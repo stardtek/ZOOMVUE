@@ -7,12 +7,7 @@ const schema = Joi.object().keys({
   password: Joi.string().max(500).required().min(8)
 });
 
-
-
-
 const users = db.get("users");
-
-
 
 async function getUser() {
   return users.find({},["username", "email"]);
@@ -20,6 +15,9 @@ async function getUser() {
 
 async function getAll() {
   return users.find({},["username", "email"]);
+}
+async function getUsernames() {
+  return users.find({},["username"]);
 }
 
  async function insert (user) {
@@ -69,5 +67,6 @@ async function getAll() {
   module.exports = {
     insert,
     getAll,
+    getUsernames,
     findUser,
   };

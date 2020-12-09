@@ -5,6 +5,7 @@
         <img src="@/assets/logo2.jpg" width="80" alt="LOGO"/></router-link>
       | <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> |
+      <router-link to="/chat">Chat</router-link> |
       <div v-if="logedStatus == false">
       <router-link to="/login">Login</router-link> |
       <router-link to="/register">Register</router-link> |
@@ -67,7 +68,7 @@
         />
       </div>
 
-      <button type="submit" class="btn btn-primary">Add Message</button>
+      <button type="submit" class="btn btn-primary">Register</button>
     </form>
   </div>
 </template>
@@ -109,8 +110,8 @@ export default {
             this.showMessageForm = false;
             this.error = "";
             this.succe = result.ok;
+            this.$router.push("/login");
           }
-          this.$router.push("/about");
         });
     },
   },

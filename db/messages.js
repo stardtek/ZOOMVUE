@@ -2,12 +2,9 @@ const Joi = require("joi");
 const db = require("./connection");
 
 const schema = Joi.object().keys({
-  username: Joi.string().alphanum().required(),
-  subject: Joi.string().required(),
-  message: Joi.string().max(500).required(),
-  imageURL: Joi.string().uri({
-    scheme: [/https?/],
-  }),
+  from: Joi.string().required(),
+  message: Joi.string().max(2000).required(),
+  to: Joi.string().required(),
 });
 
 const messages = db.get("messages");
@@ -15,12 +12,16 @@ const messages = db.get("messages");
 function getAll() {
   return messages.find();
 }
+async function getMessages(usernames) {
+  return messages.find({to: {$in: [usernames.too, usernames.from] } ,from: {$in: [usernames.too, usernames.from] }});
 
-function create(message) {
-  if (!message.username) message.username = "Anonymous";
+  
+}
+
+async function save(message) {
 
   const result = schema.validate(message);
-  console.log(message);
+  console.log("pride sm ", message, result);
   if (result.error == null) {
     message.created = new Date();
     return messages.insert(message);
@@ -30,6 +31,7 @@ function create(message) {
 }
 
 module.exports = {
-  create,
+  save,
   getAll,
+  getMessages,
 };
