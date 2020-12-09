@@ -22,18 +22,17 @@
     </div>
     <div class="row">
       <div class="col">
-        <h1 style="color: red">{{ yourName }}</h1>
+        <h1 style="color: red">{{ logedName }}</h1>
       </div>
     </div>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
       <div class="col">
-        <video ref="youCamera" autoplay muted></video>
+        <me-camera></me-camera>
       </div>
       <div class="col"  v-for="user in users" :key="user.username">
-        <rtc-camera v-bind:you="yourName"
+        <rtc-camera v-bind:you="logedName"
                     v-bind:user="user.username"
                     v-bind:is-first="user.isFirst"
-                    v-bind:cameraStream="cameraStream"
         ></rtc-camera>
       </div>
     </div>
@@ -45,6 +44,7 @@
 // eslint-disable-next-line no-unused-vars
 import adapter from 'webrtc-adapter';
 import RtcCamera from '../components/rtcCamera.vue';
+import MeCamera from '../components/MeCamera.vue';
 
 // eslint-disable-next-line no-unused-vars
 const userDisconnectedStatus = -1;
@@ -53,10 +53,6 @@ export default {
   name: 'conference',
 
   data: () => ({
-    // TODO get username from session //DONE
-
-    // yourName: this.logedName,
-
     /**
      * Expected user format
      *
@@ -68,29 +64,14 @@ export default {
      */
     users: [],
     ws: new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL),
-    cameraStream: null,
   }),
 
   components: {
     RtcCamera,
+    MeCamera,
   },
 
   mounted() {
-    // Get access to the camera!
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      }).then((stream) => {
-        this.$refs.youCamera.srcObject = stream;
-        this.$refs.youCamera.play();
-        this.cameraScream = stream;
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.log(error);
-      });
-    }
-
     // Connection opened
     this.ws.onopen = () => {
       // eslint-disable-next-line no-console
@@ -112,7 +93,7 @@ export default {
         case 'get-all-users-response':
           if (data.users && data.users.length === 0) {
             this.users.push({
-              username: this.yourName,
+              username: this.logedName,
               isFirst: true,
             });
           }
@@ -142,7 +123,7 @@ export default {
         return localStorage.getItem('user');
       }
 
-      const rand = 'Random cunt ' + Math.floor(Math.random() * 100);
+      const rand = `Random cunt ${Math.floor(Math.random() * 100)}`;
       return rand;
     },
   },

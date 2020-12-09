@@ -24,9 +24,6 @@ export default {
     /** @type {string} */
     'user',
 
-    /** @type {MediaStream} */
-    'cameraStream',
-
     // 'offer' | 'answer'
     /** @type {string} */
     'rtcType',
@@ -96,24 +93,6 @@ export default {
         console.log(error);
       });
     }
-
-    // we have to wait for camera to be defined before we can add stream
-    new Promise((resolve) => {
-      const timeout = setTimeout(() => {
-        if (this.cameraStream !== null) {
-          clearTimeout(timeout);
-          resolve();
-        }
-        // eslint-disable-next-line no-console
-        console.log('waiting for camera stream ):(');
-      }, 100);
-    }).then(() => {
-      this.cameraStream.getTracks().forEach((track) => {
-        this.rtcPeer.addTrack(track, this.cameraStream);
-        // eslint-disable-next-line no-console
-        console.log(this.cameraStream);
-      });
-    });
 
     this.ws.onopen = () => {
       // first user have to check in so other have someone to connect to
