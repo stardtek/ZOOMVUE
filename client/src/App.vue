@@ -5,7 +5,7 @@
     | <router-link to="/">Home</router-link> |
     <router-link to="/about">About</router-link> |
     <router-link to="/chat">Chat</router-link> |
-    <router-link to="/private">private</router-link> |
+    <router-link to="/private">Private</router-link> |
     <router-link to="/conference">Conference</router-link> |
     <div v-if="logedStatus === false">
       <router-link to="/login">Login</router-link> |

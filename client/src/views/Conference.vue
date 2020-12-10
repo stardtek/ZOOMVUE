@@ -1,20 +1,26 @@
 <template>
   <div class="container-fluid">
-    <div class="row">
+    <div class="row" v-if="!conferenceId">
       <div class="col">
-        <h1 style="color: red">{{ logedName }}</h1>
+        <form @submit.prevent="selectRoom">
+          <div class="form-group">
+            <label for="roomId">Room</label>
+            <input
+              v-model="room"
+              class="form-control"
+              type="text"
+              placeholder="Enter room Id"
+              id="roomId"
+            />
+            <button type="submit" class="btn btn-primary">Login</button>
+          </div>
+        </form>
       </div>
     </div>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-      <div class="col">
-        <me-camera></me-camera>
-      </div>
-      <div class="col"  v-for="user in users" :key="user.username">
-        <rtc-camera v-bind:you="logedName"
-                    v-bind:user="user.username"
-                    v-bind:shouldOffer="user.shouldOffer"
-        ></rtc-camera>
-      </div>
+    <div v-else>
+      <video-chat v-bind:username="logedName"
+                  v-bind:group="conferenceId"
+      ></video-chat>
     </div>
   </div>
 </template>
@@ -23,90 +29,23 @@
 // adapter just makes sure that all webRTC function names are the same across all browsers
 // eslint-disable-next-line no-unused-vars
 import adapter from 'webrtc-adapter';
-import RtcCamera from '../components/RtcCamera.vue';
-import MeCamera from '../components/MeCamera.vue';
+import VideoChat from '@/components/VideoChat.vue';
 
 export default {
   name: 'conference',
 
   data: () => ({
-    /**
-     * Expected user format
-     *
-     * {
-     *   username: string,
-     *   shouldOffer: boolean, default false
-     * }
-     *
-     */
-    users: [],
-    ws: new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL),
+    conferenceId: '',
+    room: '',
   }),
 
   components: {
-    RtcCamera,
-    MeCamera,
+    VideoChat,
   },
 
   mounted() {
-    // Connection opened
-    this.ws.onopen = () => {
-      // eslint-disable-next-line no-console
-      console.log('Websocket opened from conference!!!');
-      // let other users know you joined
-      this.ws.send(JSON.stringify({
-        username: this.logedName,
-        type: 'user-joined',
-      }));
-    };
-
-    // Listen for messages
-    this.ws.onmessage = (event) => {
-      // Load users video frame
-      // eslint-disable-next-line no-unused-vars
-      const data = JSON.parse(event.data);
-      if (!data.type) return;
-
-      switch (data.type) {
-        // new user joined
-        case 'user-joined':
-          if (data.users) {
-            // you joined, get names of other users in chat
-            data.users.forEach((user) => {
-              // you receive peer connection offer from users already in chat
-              this.users.push({
-                username: user,
-                shouldOffer: false,
-              });
-            });
-          } else if (data.username) {
-            // you are already in chat and new user joined
-            // you offer peer connection to new user
-            this.users.push({
-              username: data.username,
-              shouldOffer: true,
-            });
-          }
-          break;
-
-        case 'user-disconnected':
-          if (data.username) {
-            const userIndex = this.users.findIndex((user) => user.username === data.username);
-            if (userIndex !== -1) {
-              this.users.splice(userIndex, 1);
-            }
-
-            // eslint-disable-next-line no-console
-            console.log('user disconnected', data.username);
-            // eslint-disable-next-line no-console
-            console.log(this.users);
-          }
-          break;
-
-        default:
-          break;
-      }
-    };
+    // TODO reload conference if URL is changed manually in search bar
+    this.getParam();
   },
   computed: {
     logedStatus: () => {
@@ -126,10 +65,20 @@ export default {
     },
   },
   methods: {
+    selectRoom() {
+      this.$router.push({ name: 'ConferenceId', params: { id: this.room } });
+    },
+    getParam() {
+      this.conferenceId = this.$route.params.id;
+    },
     logout() {
       localStorage.removeItem('user');
       this.$router.push('/login');
     },
+  },
+  watch: {
+    // when redirect to new category_name, this will be callback
+    $route: 'getParam',
   },
 };
 </script>

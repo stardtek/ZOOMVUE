@@ -24,9 +24,9 @@ export default {
     /** @type {string} */
     'user',
 
-    // 'offer' | 'answer'
+    // group ID
     /** @type {string} */
-    'rtcType',
+    'group',
 
     // Should this RTC peer send offer or receive offer from other side?
     /** @type {boolean} */
@@ -39,7 +39,8 @@ export default {
      * {
      *   from: string - caller,
      *   to: string - called,
-     *   type: 'answer',
+     *   group: string - group id,
+     *   type: 'offer | answer | video-ready',
      *   description: RTC localDescription
      * }
      */
@@ -53,7 +54,6 @@ export default {
             'stun:stun1.l.google.com:19302',
             'stun:stun2.l.google.com:19302',
             'stun:stun3.l.google.com:19302',
-            'stun:stun4.l.google.com:19302',
           ],
         },
       ],
@@ -93,6 +93,7 @@ export default {
       this.ws.send(JSON.stringify({
         username: this.you,
         connectTo: this.user,
+        group: this.group,
         type: 'video-ready',
       }));
 
@@ -210,6 +211,7 @@ export default {
           this.ws.send(JSON.stringify({
             from: this.you,
             to: this.user,
+            group: this.group,
             type: 'offer',
             description: this.rtcPeer.localDescription,
           }));
@@ -232,6 +234,7 @@ export default {
           this.ws.send(JSON.stringify({
             from: this.you,
             to: data.from,
+            group: this.group,
             type: 'answer',
             description: answer,
           }));

@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 
 // all users connected to this endpoint
+// custom attributes added to client WS objects
+// - username: string,
+// - connectTo: string - optional, specifies which user this peer connects to,
+// - group: string
 let clients = [];
 
 router.ws('/', (ws) => {
@@ -21,7 +25,7 @@ router.ws('/', (ws) => {
            * }
            */
           // send new users info to all other users
-          clients.forEach((client) => {
+          clients.filter((client) => client.group === msgData.group).forEach((client) => {
             client.send(JSON.stringify({
               username: msgData.username,
               type: 'user-joined',
@@ -29,7 +33,7 @@ router.ws('/', (ws) => {
           });
 
           // send list of present users to new user
-          clients.forEach((client) => {
+          clients.filter((client) => client.group === msgData.group).forEach((client) => {
             if (!client.connectTo) {
               users.push(client.username);
             }
@@ -41,9 +45,10 @@ router.ws('/', (ws) => {
 
           // new user to list of all users
           ws.username = msgData.username;
+          ws.group = msgData.group;
           clients.push(ws);
 
-          console.log('user-joined');
+          console.log('user-joined', msgData.username, 'group', msgData.group);
           break;
 
         // each user sends info about RTC peer that connects to another user in chat
@@ -55,16 +60,17 @@ router.ws('/', (ws) => {
            *   type: 'video-ready'
            * }
            */
-          if (msgData.username && msgData.connectTo) {
+          if (msgData.username && msgData.connectTo && msgData.group) {
             ws.username = msgData.username;
             ws.connectTo = msgData.connectTo;
+            ws.group = msgData.group;
             clients.push(ws);
           }
 
           // print present users
           clients.forEach((client) => {
             if (!client.connectTo) {
-              console.log(client.username);
+              console.log('user:', client.username, 'group:', client.group);
             }
           });
           break;
@@ -76,12 +82,15 @@ router.ws('/', (ws) => {
            * {
            *   from: string - caller,
            *   to: string - called,
+           *   group: string - groupId,
            *   type: 'offer',
            *   description: RTC localDescription
            * }
            */
-          client = clients.find(client => client.username === msgData.to && client.connectTo === msgData.from);
-          console.log('offer by ', msgData.from, 'for ', msgData.to);
+          client = clients.find(client => client.username === msgData.to &&
+                                client.connectTo === msgData.from &&
+                                client.group === msgData.group);
+          console.log('offer by', msgData.from, 'for', msgData.to, 'in', msgData.group);
           if (client) client.send(msg);
           break;
         case 'answer':
@@ -89,12 +98,15 @@ router.ws('/', (ws) => {
            * {
            *   from: string - caller,
            *   to: string - called,
+           *   group: string - groupId,
            *   type: 'answer',
            *   description: RTC localDescription
            * }
            */
-          client = clients.find(client => client.username === msgData.to && client.connectTo === msgData.from);
-          console.log('answer by ', msgData.from, 'for ', msgData.to);
+          client = clients.find(client => client.username === msgData.to &&
+                                client.connectTo === msgData.from &&
+                                client.group === msgData.group);
+          console.log('answer by', msgData.from, 'for', msgData.to, 'in', msgData.group);
           if (client) client.send(msg);
           break;
 
@@ -110,7 +122,7 @@ router.ws('/', (ws) => {
     if (disconnectedClient !== -1) {
 
       // send user disconnected status
-      clients.forEach((client) => {
+      clients.filter(client => client.group === ws.group).forEach((client) => {
         if (client !== ws) {
           try {
             client.send(JSON.stringify({

@@ -11,9 +11,9 @@
             <input
               v-model="room"
               class="form-control"
-              type="test"
+              type="text"
               placeholder="Enter room Id"
-              id="message"
+              id="roomId"
             />
           </div>
 
