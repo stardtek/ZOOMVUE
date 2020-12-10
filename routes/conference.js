@@ -4,52 +4,72 @@ const router = express.Router();
 // all users connected to this endpoint
 let clients = [];
 
-const userDisconnectedStatus = -1;
-
 router.ws('/', (ws) => {
-  /**
-   * Expected message format
-   *
-   * {
-   *   user: string,
-   *   frame: string -> imgDataURL, users video frame data | -1 means user disconnected
-   * }
-   *
-   */
-
   ws.on('message', (msg) => {
-    let client;
     const msgData = JSON.parse(msg);
+    const users = [];
+    let client;
+
     try {
       switch (msgData.type) {
-        // New users requests all other connected clients
-        case 'get-all-users':
+        // New user joined
+        case 'user-joined':
           /**
            * {
-           *  type: 'get-all-users'
+           *   username: users name,
+           *   type: 'user-joined'
            * }
            */
-          const users = [];
-          clients.forEach((client) => users.push(client.username));
+          // send new users info to all other users
+          clients.forEach((client) => {
+            client.send(JSON.stringify({
+              username: msgData.username,
+              type: 'user-joined',
+            }));
+          });
+
+          // send list of present users to new user
+          clients.forEach((client) => {
+            if (!client.connectTo) {
+              users.push(client.username);
+            }
+          });
           ws.send(JSON.stringify({
             users: users,
-            type: 'get-all-users-response',
+            type: 'user-joined',
           }));
-          console.log('get-all-users req by');
+
+          // new user to list of all users
+          ws.username = msgData.username;
+          clients.push(ws);
+
+          console.log('user-joined');
           break;
 
-        // First users just send something like "i am here let's go"
-        case 'first-in':
+        // each user sends info about RTC peer that connects to another user in chat
+        case 'video-ready':
           /**
            * {
-           *   from: string - caller,
-           *   type: 'first-in'
+           *   username: name of user ready to chat,
+           *   connectTo: users name to which connect this RTC peer
+           *   type: 'video-ready'
            * }
            */
-          ws.username = msgData.from;
-          clients.push(ws);
+          if (msgData.username && msgData.connectTo) {
+            ws.username = msgData.username;
+            ws.connectTo = msgData.connectTo;
+            clients.push(ws);
+          }
+
+          // print present users
+          clients.forEach((client) => {
+            if (!client.connectTo) {
+              console.log(client.username);
+            }
+          });
           break;
 
+        // offer <-> answer exchange
         // message redirect same in both cases
         case 'offer':
           /**
@@ -60,7 +80,7 @@ router.ws('/', (ws) => {
            *   description: RTC localDescription
            * }
            */
-          client = clients.find(client => client.username === msgData.to);
+          client = clients.find(client => client.username === msgData.to && client.connectTo === msgData.from);
           console.log('offer by ', msgData.from, 'for ', msgData.to);
           if (client) client.send(msg);
           break;
@@ -73,7 +93,7 @@ router.ws('/', (ws) => {
            *   description: RTC localDescription
            * }
            */
-          client = clients.find(client => client.username === msgData.to);
+          client = clients.find(client => client.username === msgData.to && client.connectTo === msgData.from);
           console.log('answer by ', msgData.from, 'for ', msgData.to);
           if (client) client.send(msg);
           break;
@@ -83,16 +103,6 @@ router.ws('/', (ws) => {
     } catch (error) {
       console.log(error);
     }
-
-    if (msgData.from) {
-      const client = clients.find(client => client.username === msgData.from);
-      if (!client) {
-        ws.username = msgData.from;
-        clients.push(ws);
-      }
-    }
-
-    clients.forEach((client) => console.log(client.username));
   });
 
   ws.on('close', () => {
@@ -105,7 +115,7 @@ router.ws('/', (ws) => {
           try {
             client.send(JSON.stringify({
               username: clients[disconnectedClient].username,
-              frame: userDisconnectedStatus,
+              type: 'user-disconnected',
             }));
           } catch {
             console.log('Error: Tried to send message to disconnected client...');

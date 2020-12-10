@@ -4,7 +4,7 @@
       <div class="card mb-3">
         <video ref="camera" autoplay>No video available</video>
         <div class="card-body">
-          <h5 class="card-title">{{ isFirst ? firstJoinedUser : user }}</h5>
+          <h5 class="card-title">{{ user }}</h5>
         </div>
       </div>
     </div>
@@ -28,9 +28,9 @@ export default {
     /** @type {string} */
     'rtcType',
 
-    // someone has to be first so other users have someone to connect to
+    // Should this RTC peer send offer or receive offer from other side?
     /** @type {boolean} */
-    'isFirst',
+    'shouldOffer',
   ],
 
   data: () => ({
@@ -65,12 +65,6 @@ export default {
     rtcPeerCandidatesQueue: [],
 
     ws: new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL),
-
-    // username of second person to join the conference, we get it later because first user
-    // does not know remote users name so add it after connection
-    // this is only used if isFirst == true
-    /** @type {string} */
-    firstJoinedUser: '',
   }),
 
   mounted() {
@@ -95,14 +89,14 @@ export default {
     }
 
     this.ws.onopen = () => {
-      // first user have to check in so other have someone to connect to
-      if (this.isFirst) {
-        this.ws.send(JSON.stringify({
-          from: this.you,
-          type: 'first-in',
-        }));
-      } else {
-        // start connection with remote user
+      // every pair of users in chat have peer-to-peer connection between them
+      this.ws.send(JSON.stringify({
+        username: this.you,
+        connectTo: this.user,
+        type: 'video-ready',
+      }));
+
+      if (this.shouldOffer) {
         this.sendOffer();
       }
     };
@@ -194,9 +188,7 @@ export default {
         });
       }
 
-      // first user in conference does not have remote user name and please don't try
-      // to establish RTC connection with yourself
-      if (this.you !== this.user) {
+      if (this.shouldOffer) {
         // for whatever reason offer <-> answer needs to happen a few times...
         this.sendOffer();
       }
@@ -243,10 +235,6 @@ export default {
             type: 'answer',
             description: answer,
           }));
-
-          // first user in conference does not know remote users name so add it here
-          // eslint-disable-next-line vue/no-mutating-props
-          if (this.isFirst) this.firstJoinedUser = data.from;
 
           // eslint-disable-next-line no-console
           console.log('rtc answer sent');

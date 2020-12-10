@@ -32,7 +32,7 @@
       <div class="col"  v-for="user in users" :key="user.username">
         <rtc-camera v-bind:you="logedName"
                     v-bind:user="user.username"
-                    v-bind:is-first="user.isFirst"
+                    v-bind:shouldOffer="user.shouldOffer"
         ></rtc-camera>
       </div>
     </div>
@@ -43,11 +43,8 @@
 // adapter just makes sure that all webRTC function names are the same across all browsers
 // eslint-disable-next-line no-unused-vars
 import adapter from 'webrtc-adapter';
-import RtcCamera from '../components/rtcCamera.vue';
+import RtcCamera from '../components/RtcCamera.vue';
 import MeCamera from '../components/MeCamera.vue';
-
-// eslint-disable-next-line no-unused-vars
-const userDisconnectedStatus = -1;
 
 export default {
   name: 'conference',
@@ -58,7 +55,7 @@ export default {
      *
      * {
      *   username: string,
-     *   isFirst: boolean, default false, defines first user in chat so connection can begin
+     *   shouldOffer: boolean, default false
      * }
      *
      */
@@ -76,9 +73,10 @@ export default {
     this.ws.onopen = () => {
       // eslint-disable-next-line no-console
       console.log('Websocket opened from conference!!!');
-      // request all other connected clients
+      // let other users know you joined
       this.ws.send(JSON.stringify({
-        type: 'get-all-users',
+        username: this.logedName,
+        type: 'user-joined',
       }));
     };
 
@@ -90,19 +88,39 @@ export default {
       if (!data.type) return;
 
       switch (data.type) {
-        case 'get-all-users-response':
-          if (data.users && data.users.length === 0) {
+        // new user joined
+        case 'user-joined':
+          if (data.users) {
+            // you joined, get names of other users in chat
+            data.users.forEach((user) => {
+              // you receive peer connection offer from users already in chat
+              this.users.push({
+                username: user,
+                shouldOffer: false,
+              });
+            });
+          } else if (data.username) {
+            // you are already in chat and new user joined
+            // you offer peer connection to new user
             this.users.push({
-              username: this.logedName,
-              isFirst: true,
+              username: data.username,
+              shouldOffer: true,
             });
           }
+          break;
 
-          data.users.forEach((user) => {
-            this.users.push({
-              username: user,
-            });
-          });
+        case 'user-disconnected':
+          if (data.username) {
+            const userIndex = this.users.findIndex((user) => user.username === data.username);
+            if (userIndex !== -1) {
+              this.users.splice(userIndex, 1);
+            }
+
+            // eslint-disable-next-line no-console
+            console.log('user disconnected', data.username);
+            // eslint-disable-next-line no-console
+            console.log(this.users);
+          }
           break;
 
         default:
