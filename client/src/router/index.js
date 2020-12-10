@@ -1,6 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import Home from '../views/Home.vue';
-import Conference from '../views/Conference.vue';
 
 const routes = [
   {
@@ -29,7 +28,7 @@ const routes = [
   {
     path: '/conference',
     name: 'Conference',
-    component: Conference,
+    component: () => import('../views/Conference'),
   },
   {
     path: '/chat',

@@ -2,26 +2,6 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col">
-        <div id="nav">
-          <router-link id="logo" to="/">
-            <img src="@/assets/logo2_1.png" width="80" alt="LOGO"/></router-link>
-          | <router-link to="/">Home</router-link> |
-          <router-link to="/about">About</router-link> |
-          <div v-if="logedStatus === false">
-          <router-link to="/login">Login</router-link> |
-          <router-link to="/register">Register</router-link> |
-          </div>
-          <div v-if="logedStatus === true">
-            <form @submit.prevent="logout">
-              <button type="submit" >Logout</button>
-              <router-link to="/conference">Conference</router-link> |
-          </form>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
         <h1 style="color: red">{{ logedName }}</h1>
       </div>
     </div>
