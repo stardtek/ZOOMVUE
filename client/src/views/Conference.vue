@@ -18,9 +18,16 @@
       </div>
     </div>
     <div v-else>
-      <video-chat v-bind:username="logedName"
-                  v-bind:group="conferenceId"
-      ></video-chat>
+      <div class="row">
+        <div class="col-sm-6 col-md-9 col-lg-9">
+          <video-chat v-bind:username="logedName"
+                      v-bind:group="conferenceId"
+          ></video-chat>
+        </div>
+        <div class="col-sm-6 col-md-3 col-lg-3">
+          <text-window v-bind:username="logedName"></text-window>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -30,6 +37,7 @@
 // eslint-disable-next-line no-unused-vars
 import adapter from 'webrtc-adapter';
 import VideoChat from '@/components/VideoChat.vue';
+import TextWindow from '@/components/TextWindow.vue';
 
 export default {
   name: 'conference',
@@ -40,6 +48,7 @@ export default {
   }),
 
   components: {
+    TextWindow,
     VideoChat,
   },
 
@@ -47,6 +56,7 @@ export default {
     // TODO reload conference if URL is changed manually in search bar
     this.getParam();
   },
+
   computed: {
     logedStatus: () => {
       if (localStorage.getItem('user')) {
@@ -69,7 +79,15 @@ export default {
       this.$router.push({ name: 'ConferenceId', params: { id: this.room } });
     },
     getParam() {
+      if (this.conferenceId) {
+        // make sure page reloads when you exit or change conference room
+        // otherwise your camera stays connected to the chat instead of disconnecting
+        window.location.reload();
+      }
+
       this.conferenceId = this.$route.params.id;
+      // eslint-disable-next-line no-console
+      console.log('route changed');
     },
     logout() {
       localStorage.removeItem('user');
@@ -86,11 +104,6 @@ export default {
 <style>
 .container-fluid {
   background-color: #2c3e50;
-}
-
-video {
-  width: 100%;
-  height: auto;
 }
 
 </style>

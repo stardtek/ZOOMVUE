@@ -1,12 +1,21 @@
 <template>
-  <div>
-    <video ref="camera" autoplay muted></video>
+  <div class="card m-1">
+    <video class="card-img-top" ref="camera" autoplay muted>No video available</video>
+    <div class="card-body">
+      <h5 class="card-title">{{ username }}</h5>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'MeCamera',
+
+  props: [
+    // your username
+    /** @type {string} */
+    'username',
+  ],
 
   mounted() {
     // Get access to the camera!

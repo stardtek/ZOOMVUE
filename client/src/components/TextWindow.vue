@@ -1,5 +1,5 @@
 <template>
-  <div class="card mt-3">
+  <div class="card my-3">
     <div class="active-users">
       <div>
         <h3>Active users: </h3>
@@ -25,12 +25,12 @@
             </div>
             <div class="card-footer">
 
-                <form>
-                    <div class="gorm-group">
+                <form @submit.prevent>
+                    <div class="form-group">
                         <label for="user">User:</label>
-                        <h2 id="user">{{ logedName }}</h2>
+                        <h2 id="user">{{ username }}</h2>
                     </div>
-                    <div class="gorm-group pb-3">
+                    <div class="form-group pb-3">
                         <label for="message">Message:</label>
                         <input ref="newMessage" type="text" class="form-control" id="message">
                     </div>
@@ -73,7 +73,7 @@ export default {
       console.log('Open ');
 
       // const data = JSON.parse(event.data);
-      this.users.push(this.logedName);
+      this.users.push(this.username);
       // console.log(event);
     };
 
@@ -109,7 +109,7 @@ export default {
     // eslint-disable-next-line no-unused-vars
     send(event) {
       const data = JSON.stringify({
-        username: this.logedName,
+        username: this.username,
         message: this.$refs.newMessage.value,
         group: this.$route.params.id,
       });

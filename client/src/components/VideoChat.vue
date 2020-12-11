@@ -1,13 +1,8 @@
 <template>
-  <div>
-    <div class="row">
-      <div class="col">
-        <h1 style="color: red">{{ username }}</h1>
-      </div>
-    </div>
+  <div class="my-3">
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
       <div class="col">
-        <me-camera></me-camera>
+        <me-camera v-bind:username="username"></me-camera>
       </div>
       <div class="col"  v-for="user in users" :key="user.username">
         <rtc-camera v-bind:you="username"

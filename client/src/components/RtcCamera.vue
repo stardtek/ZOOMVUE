@@ -1,12 +1,10 @@
 <template>
-  <div class="row">
-    <div class="col">
-      <div class="card mb-3">
-        <video ref="camera" autoplay>No video available</video>
-        <div class="card-body">
-          <h5 class="card-title">{{ user }}</h5>
-        </div>
-      </div>
+  <div class="card m-1">
+    <video  class="card-img-top" ref="camera" autoplay>
+      No video available
+    </video>
+    <div class="card-body">
+      <h5 class="card-title">{{ user }}</h5>
     </div>
   </div>
 </template>
@@ -256,7 +254,6 @@ export default {
 
 <style scoped>
 video {
-  border-radius: 1px;
   width: 100%;
   height: auto;
 }
