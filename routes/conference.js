@@ -2,59 +2,132 @@ const express = require('express');
 const router = express.Router();
 
 // all users connected to this endpoint
+// custom attributes added to client WS objects
+// - username: string,
+// - connectTo: string - optional, specifies which user this peer connects to,
+// - group: string
 let clients = [];
 
-const userDisconnectedStatus = -1;
-
 router.ws('/', (ws) => {
-  // Add new client to Broadcast list
-  clients.push(ws);
-
-  /**
-   * Expected message format
-   *
-   * {
-   *   username: string,
-   *   frame: string -> imgDataURL, users video frame data | -1 means user disconnected
-   * }
-   *
-   */
-
   ws.on('message', (msg) => {
-    // broadcast frame to all connected clients
-    clients.forEach((client) => {
-      // don't send users own video back to him
-      if (client !== ws) {
-        try {
-          if (client.bufferedAmount === 0) {
-            client.send(msg);
-          } else {
-            console.log('WS overloaded, skipped this message');
+    const msgData = JSON.parse(msg);
+    const users = [];
+    let client;
+
+    try {
+      switch (msgData.type) {
+        // New user joined
+        case 'user-joined':
+          /**
+           * {
+           *   username: users name,
+           *   type: 'user-joined'
+           * }
+           */
+          // send new users info to all other users
+          clients.filter((client) => client.group === msgData.group).forEach((client) => {
+            client.send(JSON.stringify({
+              username: msgData.username,
+              type: 'user-joined',
+            }));
+          });
+
+          // send list of present users to new user
+          clients.filter((client) => client.group === msgData.group).forEach((client) => {
+            if (!client.connectTo) {
+              users.push(client.username);
+            }
+          });
+          ws.send(JSON.stringify({
+            users: users,
+            type: 'user-joined',
+          }));
+
+          // new user to list of all users
+          ws.username = msgData.username;
+          ws.group = msgData.group;
+          clients.push(ws);
+
+          console.log('user-joined', msgData.username, 'group', msgData.group);
+          break;
+
+        // each user sends info about RTC peer that connects to another user in chat
+        case 'video-ready':
+          /**
+           * {
+           *   username: name of user ready to chat,
+           *   connectTo: users name to which connect this RTC peer
+           *   type: 'video-ready'
+           * }
+           */
+          if (msgData.username && msgData.connectTo && msgData.group) {
+            ws.username = msgData.username;
+            ws.connectTo = msgData.connectTo;
+            ws.group = msgData.group;
+            clients.push(ws);
           }
-        } catch {
-          console.log('Error: Tried to send message to disconnected client...');
-        }
-      } else if (!client.username) {
-        // add username to each socket, so we can tell later which user disconnected
-        const msgData = JSON.parse(msg);
-        if (msgData.username) {
-          client.username = msgData.username;
-        }
+
+          // print present users
+          clients.forEach((client) => {
+            if (!client.connectTo) {
+              console.log('user:', client.username, 'group:', client.group);
+            }
+          });
+          break;
+
+        // offer <-> answer exchange
+        // message redirect same in both cases
+        case 'offer':
+          /**
+           * {
+           *   from: string - caller,
+           *   to: string - called,
+           *   group: string - groupId,
+           *   type: 'offer',
+           *   description: RTC localDescription
+           * }
+           */
+          client = clients.find(client => client.username === msgData.to &&
+                                client.connectTo === msgData.from &&
+                                client.group === msgData.group);
+          console.log('offer by', msgData.from, 'for', msgData.to, 'in', msgData.group);
+          if (client) client.send(msg);
+          break;
+        case 'answer':
+          /**
+           * {
+           *   from: string - caller,
+           *   to: string - called,
+           *   group: string - groupId,
+           *   type: 'answer',
+           *   description: RTC localDescription
+           * }
+           */
+          client = clients.find(client => client.username === msgData.to &&
+                                client.connectTo === msgData.from &&
+                                client.group === msgData.group);
+          console.log('answer by', msgData.from, 'for', msgData.to, 'in', msgData.group);
+          if (client) client.send(msg);
+          break;
+
+        default:
       }
-    });
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   ws.on('close', () => {
-    const disconectedClient = clients.indexOf(ws);
-    if (disconectedClient !== -1) {
+    const disconnectedClient = clients.indexOf(ws);
+    if (disconnectedClient !== -1) {
 
       // send user disconnected status
-      clients.forEach((client) => {
+      clients.filter(client => client.group === ws.group).forEach((client) => {
         if (client !== ws) {
           try {
             client.send(JSON.stringify({
-              username: clients[disconectedClient].username,
-              frame: userDisconnectedStatus,
+              username: clients[disconnectedClient].username,
+              type: 'user-disconnected',
             }));
           } catch {
             console.log('Error: Tried to send message to disconnected client...');
@@ -62,7 +135,7 @@ router.ws('/', (ws) => {
         }
       });
 
-      clients.splice(disconectedClient, 1);
+      clients.splice(disconnectedClient, 1);
       console.log('Client disconnected...');
     }
   });

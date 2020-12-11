@@ -1,30 +1,31 @@
 <template>
-  <div>
-    <div id="nav">
-        <router-link id="logo" to="/">
-          <img src="@/assets/logo2_1.png" width="80" alt="LOGO"/></router-link>
-        | <router-link to="/">Home</router-link> |
-        <router-link to="/about">About</router-link> |
-        <div v-if="logedStatus == false">
-        <router-link to="/login">Login</router-link> |
-        <router-link to="/register">Register</router-link> |
-        </div>
-        <div v-if="logedStatus == true">
-          <form @submit.prevent="logout">
-            <button type="submit" >Logout</button>
-            <router-link to="/conference">Conference</router-link> |
+  <div class="container-fluid">
+    <div class="row" v-if="!conferenceId">
+      <div class="col">
+        <form @submit.prevent="selectRoom">
+          <div class="form-group">
+            <label for="roomId">Room</label>
+            <input
+              v-model="room"
+              class="form-control"
+              type="text"
+              placeholder="Enter room Id"
+              id="roomId"
+            />
+            <button type="submit" class="btn btn-primary">Login</button>
+          </div>
         </form>
-        </div>
-
       </div>
-    <div class="container-fluid">
-
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-        <div class="col" v-if="wsSocket !== null">
-          <me-camera v-bind:username="logedName" v-bind:wsSocket="wsSocket"></me-camera>
+    </div>
+    <div v-else>
+      <div class="row">
+        <div class="col-sm-6 col-md-9 col-lg-9">
+          <video-chat v-bind:username="logedName"
+                      v-bind:group="conferenceId"
+          ></video-chat>
         </div>
-        <div class="col" v-for="user in users" :key="user.username">
-          <you-camera v-bind:username="user.username" v-bind:frame="user.frame" />
+        <div class="col-sm-6 col-md-3 col-lg-3">
+          <text-window v-bind:username="logedName"></text-window>
         </div>
       </div>
     </div>
@@ -32,70 +33,30 @@
 </template>
 
 <script>
-/* eslint-disable prefer-template */
-import MeCamera from '../components/MeCamera.vue';
-import YouCamera from '../components/YouCamera.vue';
-
-const userDisconnectedStatus = -1;
+// adapter just makes sure that all webRTC function names are the same across all browsers
+// eslint-disable-next-line no-unused-vars
+import adapter from 'webrtc-adapter';
+import VideoChat from '@/components/VideoChat.vue';
+import TextWindow from '@/components/TextWindow.vue';
 
 export default {
   name: 'conference',
 
   data: () => ({
-    // TODO get username from session //DONE
-
-    // yourName: this.logedName,
-
-    /**
-     * Expected user format
-     *
-     * {
-     *   username: string,
-     *   frame: string -> imgDataURL, users video frame data | -1 means user disconnected
-     * }
-     *
-     */
-    users: [],
-    wsSocket: null,
+    conferenceId: '',
+    room: '',
   }),
 
   components: {
-    MeCamera,
-    YouCamera,
+    TextWindow,
+    VideoChat,
   },
 
   mounted() {
-    this.wsSocket = new WebSocket(process.env.VUE_APP_CONFERENCE_WS_URL);
-
-    // Connection opened
-    this.wsSocket.addEventListener('open', () => {
-      // eslint-disable-next-line no-console
-      console.log('Websocket opened from conference!!!');
-    });
-
-    // Listen for messages
-    this.wsSocket.addEventListener('message', (event) => {
-      // Load users video frame
-      // eslint-disable-next-line no-unused-vars
-      const data = JSON.parse(event.data);
-
-      // ignore empty messages or messages with missing data
-      if (!data || !data.username || !data.frame) return;
-
-      const userIndex = this.users.findIndex((user) => user.username === data.username);
-
-      if (data.frame === userDisconnectedStatus && userIndex !== -1) {
-        // remove disconnected user from grid
-        this.users.splice(userIndex, 1);
-      } else if (userIndex === -1) {
-        // new user joined
-        this.users.push(data);
-      } else {
-        // refresh users image
-        this.users[userIndex].frame = data.frame;
-      }
-    });
+    // TODO reload conference if URL is changed manually in search bar
+    this.getParam();
   },
+
   computed: {
     logedStatus: () => {
       if (localStorage.getItem('user')) {
@@ -109,15 +70,33 @@ export default {
         return localStorage.getItem('user');
       }
 
-      const rand = 'Random cunt ' + Math.floor(Math.random() * 100);
+      const rand = `Random cunt ${Math.floor(Math.random() * 100)}`;
       return rand;
     },
   },
   methods: {
+    selectRoom() {
+      this.$router.push({ name: 'ConferenceId', params: { id: this.room } });
+    },
+    getParam() {
+      if (this.conferenceId) {
+        // make sure page reloads when you exit or change conference room
+        // otherwise your camera stays connected to the chat instead of disconnecting
+        window.location.reload();
+      }
+
+      this.conferenceId = this.$route.params.id;
+      // eslint-disable-next-line no-console
+      console.log('route changed');
+    },
     logout() {
       localStorage.removeItem('user');
       this.$router.push('/login');
     },
+  },
+  watch: {
+    // when redirect to new category_name, this will be callback
+    $route: 'getParam',
   },
 };
 </script>

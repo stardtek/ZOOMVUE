@@ -1,45 +1,26 @@
 <template>
-  <div>
-    <div id="nav">
-        <router-link id="logo" to="/">
-        <img src="@/assets/logo2.jpg" width="80" alt="LOGO"/></router-link>
-        | <router-link to="/">Home</router-link> |
-        <router-link to="/about">About</router-link> |
-        <router-link to="/chat">Chat</router-link> |
-        <div v-if="logedStatus == false">
-        <router-link to="/login">Login</router-link> |
-        <router-link to="/register">Register</router-link> |
-    </div>
-
-      <div v-if="logedStatus == true">
-        <form @submit.prevent="logout">
-          <button type="submit" >Logout</button>
-      </form>
+  <div class="container-fluid">
+      <div class="col" v-if="wsSocket !== null && query">
+        <chatWin v-bind:username="logedName" v-bind:wsSocket="wsSocket"></chatWin>
       </div>
-    </div>
-    <div class="container-fluid">
-        <div class="col" v-if="wsSocket !== null && query">
-          <chatWin v-bind:username="logedName" v-bind:wsSocket="wsSocket"></chatWin>
-        </div>
 
-        <div class="col" v-else>
-          <form @submit.prevent="roomSelect">
-            <div class="form-group">
-              <label for="roomId">Room</label>
-              <input
-                v-model="room"
-                class="form-control"
-                type="test"
-                placeholder="Enter room Id"
-                id="message"
-              />
-            </div>
+      <div class="col" v-else>
+        <form @submit.prevent="roomSelect">
+          <div class="form-group">
+            <label for="roomId">Room</label>
+            <input
+              v-model="room"
+              class="form-control"
+              type="text"
+              placeholder="Enter room Id"
+              id="roomId"
+            />
+          </div>
 
-            <button type="submit" class="btn btn-primary">Login</button>
-          </form>
-        </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+      </div>
 
-    </div>
   </div>
 </template>
 

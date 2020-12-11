@@ -13,7 +13,7 @@ require('dotenv').config();
 const expressWs = require('express-ws');
 let app = express();
 
-if (process.env.HTTPS == 1) {
+if (process.env.HTTPS === 1) {
   // TODO this could be wrong or just needs proper SSL certificate and domain to work
   // WebSocket via SSL
   expressWs(app, https.createServer({

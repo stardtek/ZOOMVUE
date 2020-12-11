@@ -18,7 +18,7 @@
 
                     <div class="gorm-group pb-3">
                         <label for="message">Message:</label>
-                        <input ref="newMessage" type="text" class="form-control">
+                        <input ref="newMessage" type="text" class="form-control" id="message">
                     </div>
                     <button v-on:click="send" type="submit" class="btn btn-success">Send</button>
                 </form>
