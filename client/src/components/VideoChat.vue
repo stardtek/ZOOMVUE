@@ -1,5 +1,5 @@
 <template>
-  <div class="my-3">
+  <div class="m-1">
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
       <div class="col">
         <me-camera v-bind:username="username"></me-camera>

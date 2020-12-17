@@ -1,27 +1,37 @@
 <template>
   <div class="container-fluid">
-      <div class="col" v-if="wsSocket !== null && query">
+    <div class="row"  v-if="wsSocket !== null && query">
+      <div class="col">
         <chatWin v-bind:username="logedName" v-bind:wsSocket="wsSocket"></chatWin>
       </div>
-
-      <div class="col" v-else>
-        <form @submit.prevent="roomSelect">
-          <div class="form-group">
-            <label for="roomId">Room</label>
-            <input
-              v-model="room"
-              class="form-control"
-              type="text"
-              placeholder="Enter room Id"
-              id="roomId"
-            />
-          </div>
-
-          <button type="submit" class="btn btn-primary">Login</button>
-        </form>
+    </div>
+    <div v-else>
+      <div class="row">
+        <div class="col">
+          <h3>Please enter Room ID to enter conference</h3>
+        </div>
       </div>
+      <div class="row">
+        <div class="col"></div>
+        <div class="col">
+          <form @submit.prevent="roomSelect">
+            <div class="form-outline my-4">
+              <input
+                v-model="room"
+                class="form-control"
+                type="text"
+                id="roomId"
+              />
+              <label class="form-label" for="roomId">Room ID</label>
+            </div>
 
-  </div>
+            <button type="submit" class="btn btn-green btn-block">Login</button>
+          </form>
+        </div>
+        <div class="col"></div>
+      </div>
+    </div>
+    </div>
 </template>
 
 <script>
@@ -122,8 +132,5 @@ export default {
 </script>
 
 <style>
-.container-fluid {
-  background-color: #2c3e50;
-}
 
 </style>

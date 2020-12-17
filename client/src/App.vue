@@ -1,25 +1,73 @@
 <template>
-  <div id="nav">
-    <router-link id="logo" to="/">
-      <img src="@/assets/logo2.jpg" width="80" alt="LOGO"/></router-link>
-    | <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/chat">Chat</router-link> |
-    <router-link to="/private">Private</router-link> |
-    <router-link to="/conference">Conference</router-link> |
-    <div v-if="logedStatus === false">
-      <router-link to="/login">Login</router-link> |
-      <router-link to="/register">Register</router-link> |
+  <nav class="navbar navbar-expand-lg navbar-expand-md navbar-light">
+    <div class="container-fluid">
+      <router-link class="navbar-brand" id="logo" to="/">
+        <img src="@/assets/logo3.png" class="img-fluid" width="100" alt="LOGO"/>
+      </router-link>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-mdb-toggle="collapse"
+        data-mdb-target="#navbarText"
+        aria-controls="navbarText"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="fas fa-bars"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <router-link class="nav-item btn btn-smoke m-1" to="/">
+              Home
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-item btn btn-smoke m-1" to="/about">
+              About
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-item btn btn-smoke m-1" to="/chat">
+              Chat
+            </router-link>
+          </li>
+          <li class="nav-item" v-if="logedStatus === true">
+            <router-link class="nav-item btn btn-smoke m-1" to="/private">
+              Private chat
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-item btn btn-smoke m-1" to="/conference">
+              Conference
+            </router-link>
+          </li>
+        </ul>
+        <div>
+          <div v-if="logedStatus === false">
+            <router-link class="btn btn-smoke m-1" to="/login">
+              Login
+            </router-link>
+            <router-link class="btn btn-smoke m-1" to="/register">
+              Register
+            </router-link>
+          </div>
+          <div v-else>
+            <form @submit.prevent="logout">
+              <button class="btn btn-dark m-1" type="submit">Logout</button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <div v-if="logedStatus === true">
-      <form @submit.prevent="logout">
-        <button type="submit" >Logout</button>
-      </form>
-    </div>
-  </div>
-  <router-view>
+  </nav>
+  <router-view class="py-4">
   </router-view>
+  <footer class="bottom-100">
+    <div class="text-center p-3">
+      © 2020 Copyright: HOGS Saloon
+    </div>
+  </footer>
 </template>
 <script>
 /* eslint quotes: ["error", "double"] */
@@ -55,33 +103,58 @@ export default {
   },
 };
 </script>
-<style>
+<style lang="scss">
+$orange: #FF7F50;
+$gray: #2C3E50;
+$green: #556B2F;
+$white: #FFFAFA;
+$smoke-white: #F5F5F5;
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-
-  --mdc-theme-primary: #2c3e50;
-  --mdc-theme-on-primary: #FFFAFA;
-}
-#logo {
-  float: left;
-}
-#nav {
-  padding: 30px;
-  border: #2c3e50;
-  border-width: 2px;
-  border-style: double;
+  color: $gray;
 }
 
-#nav a {
+.navbar {
+  background-color: $orange;
+}
+
+.navbar-toggler {
+  color: $gray;
+}
+
+footer {
+  width: 100%;
+  background-color: $orange;
+}
+
+.btn-green {
+  background-color: $green;
+  color: $white;
   font-weight: bold;
-  color: #2c3e50;
+  font-size: medium;
 }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
+.btn-smoke {
+  background-color: $smoke-white;
+  font-weight: bold;
 }
+
+.card {
+  background-color: $smoke-white;
+}
+
+.link-gray {
+  color: $gray;
+  font-size: larger;
+}
+
+.link-smoke {
+  color: $smoke-white;
+  font-size: larger;
+}
+
 </style>

@@ -1,32 +1,38 @@
 <template>
-  <div class="container-fluid">
-    <div class="row" v-if="!conferenceId">
+  <div class="container" v-if="!conferenceId">
+    <div class="row">
       <div class="col">
-        <form @submit.prevent="selectRoom">
-          <div class="form-group">
-            <label for="roomId">Room</label>
-            <input
-              v-model="room"
-              class="form-control"
-              type="text"
-              placeholder="Enter room Id"
-              id="roomId"
-            />
-            <button type="submit" class="btn btn-primary">Login</button>
-          </div>
-        </form>
+        <h3>Please enter Room ID to enter conference</h3>
       </div>
     </div>
-    <div v-else>
-      <div class="row">
-        <div class="col-sm-6 col-md-9 col-lg-9">
-          <video-chat v-bind:username="logedName"
-                      v-bind:group="conferenceId"
-          ></video-chat>
-        </div>
-        <div class="col-sm-6 col-md-3 col-lg-3">
-          <text-window v-bind:username="logedName"></text-window>
-        </div>
+    <div class="row">
+      <div class="col"></div>
+      <div class="col">
+        <form @submit.prevent="selectRoom">
+          <div class="form-outline my-4">
+            <input
+              v-model="room"
+              type="text"
+              id="roomId"
+              class="form-control form-control-lg"
+            />
+            <label class="form-label" for="roomId">Room ID</label>
+          </div>
+          <button type="submit" class="btn btn-green btn-block">Login</button>
+        </form>
+      </div>
+      <div class="col"></div>
+    </div>
+  </div>
+  <div class="container-fluid" v-else>
+    <div class="row">
+      <div class="col-sm-6 col-md-9 col-lg-9">
+        <video-chat v-bind:username="logedName"
+                    v-bind:group="conferenceId"
+        ></video-chat>
+      </div>
+      <div class="col-sm-6 col-md-3 col-lg-3">
+        <text-window v-bind:username="logedName"></text-window>
       </div>
     </div>
   </div>
@@ -53,7 +59,6 @@ export default {
   },
 
   mounted() {
-    // TODO reload conference if URL is changed manually in search bar
     this.getParam();
   },
 
@@ -102,8 +107,5 @@ export default {
 </script>
 
 <style>
-.container-fluid {
-  background-color: #2c3e50;
-}
 
 </style>

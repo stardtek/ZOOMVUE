@@ -1,44 +1,55 @@
 <template>
-  <div class="card my-3">
+  <div class="card">
     <div class="active-users">
-      <div>
-        <h3>Active users: </h3>
-        <div ref="usersDiv" v-for="(user, indexUsers) in users" :key="indexUsers">
-
-          <ul>
-            <li><span class="font-weight-bold">{{ user }}</span></li>
-          </ul>
+      <div class="card-body">
+        <div class="card-title">
+          <h3>Active users:</h3>
         </div>
+        <ul ref="usersDiv" v-for="(user, indexUsers) in users" :key="indexUsers"
+            class="list-group list-group-flush"
+        >
+          <li class="list-group-item">
+            <span class="font-weight-bold">{{ user === username ? user + ' (You)' : user }}</span>
+          </li>
+        </ul>
       </div>
     </div>
-            <div class="card-body">
-                <div class="card-title">
-                    <h3>Chat Group</h3>
-                    <hr>
+      <div class="card-body p-0">
+          <div class="card-title">
+              <h3>Chat Group</h3>
+              <hr>
+          </div>
+          <div class="card-body overflow-auto" id="message-list">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item" v-for="(msg, index) in messages" :key="index">
+                <div v-if="username === msg.username"
+                     class="float-end font-weight-bold text-break text-right"
+                >
+                  {{ msg.message }}
                 </div>
-                <div class="card-body">
-                    <div class="messages" v-for="(msg, index) in messages" :key="index">
-                        <p><span class="font-weight-bold">{{ msg.username }}:
-                            </span>{{ msg.message }}</p>
-                    </div>
+                <div v-else class="float-start text-justify text-break text-left">
+                    <span class="font-weight-bold">
+                      {{ msg.username }}:
+                    </span>
+                    {{ msg.message }}
                 </div>
-            </div>
-            <div class="card-footer">
-
-                <form @submit.prevent>
-                    <div class="form-group">
-                        <label for="user">User:</label>
-                        <h2 id="user">{{ username }}</h2>
-                    </div>
-                    <div class="form-group pb-3">
-                        <label for="message">Message:</label>
-                        <input ref="newMessage" type="text" class="form-control" id="message">
-                    </div>
-                    <button v-on:click="send" type="submit" class="btn btn-success">Send</button>
-                </form>
-            </div>
+              </li>
+            </ul>
+          </div>
+      </div>
+      <div class="card-footer">
+          <form @submit.prevent>
+              <div class="form-outline pb-3">
+                  <input ref="newMessage" type="text" class="form-control" id="message">
+                  <label class="form-label" for="message">Message</label>
+              </div>
+              <button v-on:click="send"
+                      type="submit"
+                      class="btn btn-green btn-block"
+              >Send</button>
+          </form>
+      </div>
     </div>
-
 </template>
 
 <script>
@@ -142,12 +153,8 @@ export default {
 </script>
 
 <style>
-  div.card-body {
-    margin:5px;
-    padding:5px;
-    background-color: aliceblue;
-    overflow: auto;
-    height: 50vh;
-  }
+#message-list {
+  height: 50vh;
+}
 
 </style>

@@ -2,7 +2,7 @@
   <div class="card m-1">
     <video class="card-img-top" ref="camera" autoplay muted>No video available</video>
     <div class="card-body">
-      <h5 class="card-title">{{ username }}</h5>
+      <h4 class="card-title font-weight-bold">{{ username }}</h4>
     </div>
   </div>
 </template>

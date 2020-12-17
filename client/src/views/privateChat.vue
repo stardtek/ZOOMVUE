@@ -1,16 +1,27 @@
 <template>
   <div class="container-fluid">
-      <div class="userLinks" v-for="(msg, index) in users" :key="index">
-          <router-link :to="{name:'privateId', params: {id: msg.username} }">
-            <span class="font-weight-bold">{{ msg.username }}:
-              </span></router-link>
+    <div class="row">
+      <div class="col d-flex justify-content-center">
+        <div class="d-inline"
+            v-for="(msg, index) in users" :key="index"
+        >
+          <router-link
+                  :to="{name:'privateId', params: {id: msg.username} }"
+                  class="btn my-1 mx-2"
+                  :class="msg.username === query ? 'btn-green link-smoke' : 'btn-smoke link-gray'"
+          >
+            {{ msg.username }}
+          </router-link>
+        </div>
       </div>
-      <div><h3>{{ query }}</h3></div>
-      <div>
-        <div class="col" v-if="wsSocket !== null && query">
+    </div>
+    <div class="row">
+      <div class="col-md-1 col-lg-2"></div>
+      <div class="col col-md-10 col-lg-8" v-if="wsSocket !== null && query">
         <chatWin v-bind:username="logedName" v-bind:wsSocket="wsSocket"></chatWin>
       </div>
-      </div>
+      <div class="col-md-1 col-lg-2"></div>
+    </div>
 
   </div>
 </template>
@@ -136,8 +147,5 @@ export default {
 </script>
 
 <style>
-.container-fluid {
-  background-color: #2c3e50;
-}
 
 </style>
