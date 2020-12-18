@@ -1,39 +1,44 @@
 <template>
-  <div>
-    <form @submit.prevent="login" class="mb-3">
-      <div v-if="error" class="alert alert-dismissible alert-warning">
-        <button type="button" class="close" data-dismiss="alert">
-          &times;
-        </button>
-        <h4 class="alert-heading">Error!</h4>
-        <p class="mb-0">{{ error }}</p>
-      </div>
+  <div class="row pt-5 pb-2">
+    <div class="col">
+      <h1>Login</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4 col-lg-4"></div>
+    <div class="col col-md-4 col-lg-4">
+      <form @submit.prevent="login" class="mb-3">
+        <div v-if="error" class="alert alert-dismissible alert-warning">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <h4 class="alert-heading">Error!</h4>
+          <p class="mb-0">{{ error }}</p>
+        </div>
 
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input
-          v-model="loginData.username"
-          type="text"
-          class="form-control"
-          id="username"
-          placeholder="Enter username"
-          required
-        />
-      </div>
+        <div class="form-outline my-5">
+          <input
+            v-model="loginData.username"
+            type="text"
+            class="form-control"
+            id="username"
+            required
+          />
+          <label class="form-label" for="username">Username</label>
+        </div>
 
-      <div class="form-group">
-        <label for="password">password</label>
-        <input
-          v-model="loginData.password"
-          class="form-control"
-          type="password"
-          placeholder="Enter password"
-          id="message"
-        />
-      </div>
+        <div class="form-outline mb-5">
+          <input
+            v-model="loginData.password"
+            class="form-control"
+            type="password"
+            id="password"
+          />
+          <label class="form-label" for="password">Password</label>
+        </div>
 
-      <button type="submit" class="btn btn-primary">Login</button>
-    </form>
+        <button type="submit" class="btn btn-green btn-block">Login</button>
+      </form>
+    </div>
+    <div class="col-md-4 col-lg-4"></div>
   </div>
 </template>
 

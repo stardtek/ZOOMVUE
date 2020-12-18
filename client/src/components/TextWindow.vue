@@ -38,7 +38,7 @@
           </div>
       </div>
       <div class="card-footer">
-          <form @submit.prevent>
+          <form @submit.prevent class="pb-3">
               <div class="form-outline pb-3">
                   <input ref="newMessage" type="text" class="form-control" id="message">
                   <label class="form-label" for="message">Message</label>

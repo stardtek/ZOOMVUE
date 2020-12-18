@@ -1,58 +1,60 @@
 <template>
-  <div>
-    <form @submit.prevent="addUsser" class="mb-3">
-      <div v-if="error" class="alert alert-dismissible alert-warning">
-        <button type="button" class="close" data-dismiss="alert">
-          &times;
-        </button>
-        <h4 class="alert-heading">Error!</h4>
-        <p class="mb-0">{{ error }}</p>
-      </div>
-      <div v-if="succe" class="alert alert-dismissible alert-warning">
-        <button type="button" class="close" data-dismiss="alert">
-          &times;
-        </button>
-        <h4 class="alert-heading">OK!</h4>
-        <p class="mb-0">{{ succe }}</p>
-      </div>
+  <div class="row pt-5 pb-2">
+    <div class="col">
+      <h1>Registration</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4 col-lg-4"></div>
+    <div class="col col-md-4 col-lg-4">
+      <form @submit.prevent="addUsser" class="mb-3">
+        <div v-if="error" class="alert alert-dismissible alert-warning">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <h4 class="alert-heading">Error!</h4>
+          <p class="mb-0">{{ error }}</p>
+        </div>
+        <div v-if="succe" class="alert alert-dismissible alert-warning">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <h4 class="alert-heading">OK!</h4>
+          <p class="mb-0">{{ succe }}</p>
+        </div>
 
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input
-          v-model="message.username"
-          type="text"
-          class="form-control"
-          id="username"
-          placeholder="Enter username"
-          required
-        />
-      </div>
+        <div class="form-outline my-5">
+          <input
+            v-model="message.username"
+            type="text"
+            class="form-control"
+            id="username"
+            required
+          />
+          <label class="form-label" for="username">Username</label>
+        </div>
 
-      <div class="form-group">
-        <label for="email">email</label>
-        <input
-          v-model="message.email"
-          type="email"
-          class="form-control"
-          id="subject"
-          placeholder="Enter email"
-          required
-        />
-      </div>
+        <div class="form-outline mb-5">
+          <input
+            v-model="message.email"
+            type="email"
+            class="form-control"
+            id="email"
+            required
+          />
+          <label class="form-label" for="email">email</label>
+        </div>
 
-      <div class="form-group">
-        <label for="message">password</label>
-        <input
-          v-model="message.password"
-          class="form-control"
-          type="password"
-          placeholder="Enter password"
-          id="message"
-        />
-      </div>
+        <div class="form-outline mb-5">
+          <input
+            v-model="message.password"
+            class="form-control"
+            type="password"
+            id="message"
+          />
+          <label class="form-label" for="message">Password</label>
+        </div>
 
-      <button type="submit" class="btn btn-primary">Register</button>
-    </form>
+        <button type="submit" class="btn btn-green btn-block">Register</button>
+      </form>
+    </div>
+    <div class="col-md-4 col-lg-4"></div>
   </div>
 </template>
 

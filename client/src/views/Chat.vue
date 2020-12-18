@@ -1,9 +1,11 @@
 <template>
-  <div class="container-fluid">
+  <div class="container">
     <div class="row"  v-if="wsSocket !== null && query">
-      <div class="col">
+      <div class="col-md-2 col-lg-2"></div>
+      <div class="col col-md-8 col-lg-8">
         <chatWin v-bind:username="logedName" v-bind:wsSocket="wsSocket"></chatWin>
       </div>
+      <div class="col-md-2 col-lg-2"></div>
     </div>
     <div v-else>
       <div class="row">
@@ -12,13 +14,13 @@
         </div>
       </div>
       <div class="row">
-        <div class="col"></div>
-        <div class="col">
+        <div class="col-md-4 col-lg-4"></div>
+        <div class="col col-md-4 col-lg-4">
           <form @submit.prevent="roomSelect">
             <div class="form-outline my-4">
               <input
                 v-model="room"
-                class="form-control"
+                class="form-control form-control-lg"
                 type="text"
                 id="roomId"
               />
@@ -28,7 +30,7 @@
             <button type="submit" class="btn btn-green btn-block">Login</button>
           </form>
         </div>
-        <div class="col"></div>
+        <div class="col-md-4 col-lg-4"></div>
       </div>
     </div>
     </div>

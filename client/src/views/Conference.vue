@@ -6,9 +6,9 @@
       </div>
     </div>
     <div class="row">
-      <div class="col"></div>
-      <div class="col">
-        <form @submit.prevent="selectRoom">
+      <div class="col-md-4 col-lg-4"></div>
+      <div class="col col-md-4 col-lg-4">
+        <form @submit.prevent="selectRoom" class="form-group">
           <div class="form-outline my-4">
             <input
               v-model="room"
@@ -21,7 +21,7 @@
           <button type="submit" class="btn btn-green btn-block">Login</button>
         </form>
       </div>
-      <div class="col"></div>
+      <div class="col-md-4 col-lg-4"></div>
     </div>
   </div>
   <div class="container-fluid" v-else>
