@@ -4,7 +4,7 @@
       <nav class="navbar navbar-expand-lg navbar-expand-md navbar-light">
     <div class="container-fluid">
       <router-link class="navbar-brand" id="logo" to="/">
-        <img src="@/assets/logo3.png" class="img-fluid" width="100" alt="LOGO"/>
+        <img src="@/assets/logo.png" class="img-fluid" width="100" alt="LOGO"/>
       </router-link>
       <button
         class="navbar-toggler"
@@ -45,7 +45,7 @@
             </router-link>
           </li>
         </ul>
-        <div>
+        <div class="mb-2 mb-lg-0">
           <div v-if="logedStatus === false">
             <router-link class="btn btn-smoke m-1" to="/login">
               Login
@@ -64,17 +64,19 @@
     </div>
   </nav>
     </div>
-  <div class="about">
+  <div class="about pt-5">
     <h1>About us</h1>
     <div>
       <p>Hogs sallon is an internet caffe for text and voice chat.</p>
     </div>
   </div>
-  <div><footer class="bottom-100-AB">
-    <div class="text-center p-3">
-      © 2020 Copyright: HOGS Saloon
-    </div>
-  </footer></div>
+  <div>
+    <footer class="align-items-center">
+      <div class="text-center">
+        © 2020 Copyright: HOGS Saloon
+      </div>
+    </footer>
+  </div>
 </div>
 </template>
 <script>

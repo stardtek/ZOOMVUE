@@ -5,7 +5,7 @@
       <nav class="navbar navbar-expand-lg navbar-expand-md navbar-light">
     <div class="container-fluid">
       <router-link class="navbar-brand" id="logo" to="/">
-        <img src="@/assets/logo3.png" class="img-fluid" width="100" alt="LOGO"/>
+        <img src="@/assets/logo.png" class="img-fluid" width="100" alt="LOGO"/>
       </router-link>
       <button
         class="navbar-toggler"
@@ -46,7 +46,7 @@
             </router-link>
           </li>
         </ul>
-        <div>
+        <div class="mb-2 mb-lg-0">
           <div v-if="logedStatus === false">
             <router-link class="btn btn-smoke m-1" to="/login">
               Login
@@ -65,17 +65,20 @@
     </div>
   </nav>
     </div>
-
-    <h1 id="welcome">Welcome to Hogs sallon!</h1>
-    <div>
-      <hr />
-      <img src="../assets/logo3.png" alt="" />
+    <div class="pt-3">
+      <h1 id="welcome">Welcome to Hogs saloon!</h1>
+      <div>
+        <hr />
+        <img src="../assets/logo.png" alt="" />
+      </div>
+      <div>
+        <footer class="align-items-center">
+          <div class="text-center">
+            © 2020 Copyright: HOGS Saloon
+          </div>
+        </footer>
+      </div>
     </div>
-    <div><footer class="bottom-100-HO">
-    <div class="text-center p-3">
-      © 2020 Copyright: HOGS Saloon
-    </div>
-  </footer></div>
   </div>
 </template>
 

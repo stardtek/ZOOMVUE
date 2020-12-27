@@ -23,11 +23,11 @@
             <ul class="list-group list-group-flush">
               <li class="list-group-item" v-for="(msg, index) in messages" :key="index">
                 <div v-if="username === msg.username"
-                     class="float-end font-weight-bold text-break text-right"
+                     class="float-end font-weight-bold text-break text-right text-end"
                 >
                   {{ msg.message }}
                 </div>
-                <div v-else class="float-start text-justify text-break text-left">
+                <div v-else class="float-start text-justify text-break text-left text-start">
                     <span class="font-weight-bold">
                       {{ msg.username }}:
                     </span>
@@ -40,7 +40,15 @@
       <div class="card-footer">
           <form @submit.prevent class="pb-3">
               <div class="form-outline pb-3">
-                  <input ref="newMessage" type="text" class="form-control" id="message">
+                  <input
+                    ref="newMessage"
+                    type="text"
+                    class="form-control border-start border-bottom border-end"
+                    @focusin="(e) => {e.target.closest('input').classList.add('border-primary');}"
+                    @focusout="(e) => {
+                      e.target.closest('input').classList.remove('border-primary');
+                    }"
+                    id="message">
                   <label class="form-label" for="message">Message</label>
               </div>
               <button v-on:click="send"

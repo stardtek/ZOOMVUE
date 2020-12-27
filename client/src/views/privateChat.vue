@@ -4,7 +4,7 @@
       <nav class="navbar navbar-expand-lg navbar-expand-md navbar-light">
     <div class="container-fluid">
       <router-link class="navbar-brand" id="logo" to="/">
-        <img src="@/assets/logo3.png" class="img-fluid" width="100" alt="LOGO"/>
+        <img src="@/assets/logo.png" class="img-fluid" width="100" alt="LOGO"/>
       </router-link>
       <button
         class="navbar-toggler"
@@ -64,7 +64,7 @@
     </div>
   </nav>
     </div>
-  <div class="container-fluid">
+  <div class="container-fluid pt-3 pb-5">
     <div class="row">
       <div class="col d-flex justify-content-center">
         <div class="d-inline"
@@ -89,11 +89,13 @@
     </div>
 
   </div>
-  <div><footer class="bottom-100-PC">
-    <div class="text-center p-3">
-      © 2020 Copyright: HOGS Saloon
-    </div>
-  </footer></div>
+  <div>
+    <footer class="align-items-center">
+      <div class="text-center">
+        © 2020 Copyright: HOGS Saloon
+      </div>
+    </footer>
+  </div>
 </div>
 </template>
 

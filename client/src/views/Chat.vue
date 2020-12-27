@@ -4,7 +4,7 @@
       <nav class="navbar navbar-expand-lg navbar-expand-md navbar-light">
     <div class="container-fluid">
       <router-link class="navbar-brand" id="logo" to="/">
-        <img src="@/assets/logo3.png" class="img-fluid" width="100" alt="LOGO"/>
+        <img src="@/assets/logo.png" class="img-fluid" width="100" alt="LOGO"/>
       </router-link>
       <button
         class="navbar-toggler"
@@ -45,7 +45,7 @@
             </router-link>
           </li>
         </ul>
-        <div>
+        <div class="mb-2 mb-lg-0">
           <div v-if="logedStatus === false">
             <router-link class="btn btn-smoke m-1" to="/login">
               Login
@@ -64,7 +64,7 @@
     </div>
   </nav>
     </div>
-  <div class="container">
+  <div class="container py-5">
     <div class="row"  v-if="wsSocket !== null && query">
       <div class="col-md-2 col-lg-2"></div>
       <div class="col col-md-8 col-lg-8">
@@ -75,17 +75,19 @@
     <div v-else>
       <div class="row">
         <div class="col">
-          <h3>Please enter Room ID to enter conference</h3>
+          <h3>Please enter Room ID to enter chat</h3>
         </div>
       </div>
       <div class="row">
         <div class="col-md-4 col-lg-4"></div>
         <div class="col col-md-4 col-lg-4">
-          <form @submit.prevent="roomSelect">
+          <form @submit.prevent="roomSelect" class="form-row">
             <div class="form-outline my-4">
               <input
                 v-model="room"
-                class="form-control form-control-lg"
+                class="form-control form-control-lg border-start border-bottom border-end"
+                @focusin="(e) => {e.target.closest('input').classList.add('border-primary');}"
+                @focusout="(e) => {e.target.closest('input').classList.remove('border-primary');}"
                 type="text"
                 id="roomId"
               />
@@ -99,11 +101,13 @@
       </div>
     </div>
   </div>
-  <div><footer class="bottom-100-CH">
-    <div class="text-center p-3">
-      © 2020 Copyright: HOGS Saloon
-    </div>
-  </footer></div>
+  <div>
+    <footer class="align-items-center">
+      <div class="text-center">
+        © 2020 Copyright: HOGS Saloon
+      </div>
+    </footer>
+  </div>
 </div>
 </template>
 

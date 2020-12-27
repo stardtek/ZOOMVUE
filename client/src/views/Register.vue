@@ -4,7 +4,7 @@
       <nav class="navbar navbar-expand-lg navbar-expand-md navbar-light">
     <div class="container-fluid">
       <router-link class="navbar-brand" id="logo" to="/">
-        <img src="@/assets/logo3.png" class="img-fluid" width="100" alt="LOGO"/>
+        <img src="@/assets/logo.png" class="img-fluid" width="100" alt="LOGO"/>
       </router-link>
       <button
         class="navbar-toggler"
@@ -45,7 +45,7 @@
             </router-link>
           </li>
         </ul>
-        <div>
+        <div class="mb-2 mb-lg-0">
           <div v-if="logedStatus === false">
             <router-link class="btn btn-smoke m-1" to="/login">
               Login
@@ -64,68 +64,79 @@
     </div>
   </nav>
     </div>
-  <div class="row pt-5 pb-2">
-    <div class="col">
-      <h1>Registration</h1>
+
+  <div class="container-fluid">
+    <div class="row pt-5">
+      <div class="col">
+        <h1>Registration</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 col-lg-4"></div>
+      <div class="col col-md-4 col-lg-4">
+        <form @submit.prevent="addUsser" class="mb-3">
+          <div v-if="error" class="alert alert-dismissible alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4 class="alert-heading">Error!</h4>
+            <p class="mb-0">{{ error }}</p>
+          </div>
+          <div v-if="succe" class="alert alert-dismissible alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4 class="alert-heading">OK!</h4>
+            <p class="mb-0">{{ succe }}</p>
+          </div>
+
+          <div class="form-outline my-5">
+            <input
+              v-model="message.username"
+              type="text"
+              class="form-control border-start border-bottom border-end"
+              @focusin="(e) => {e.target.closest('input').classList.add('border-primary');}"
+              @focusout="(e) => {e.target.closest('input').classList.remove('border-primary');}"
+              id="username"
+              required
+            />
+            <label class="form-label" for="username">Username</label>
+          </div>
+
+          <div class="form-outline mb-5">
+            <input
+              v-model="message.email"
+              type="email"
+              class="form-control border-start border-bottom border-end"
+              @focusin="(e) => {e.target.closest('input').classList.add('border-primary');}"
+              @focusout="(e) => {e.target.closest('input').classList.remove('border-primary');}"
+              id="email"
+              required
+            />
+            <label class="form-label" for="email">Email</label>
+          </div>
+
+          <div class="form-outline mb-5">
+            <input
+              v-model="message.password"
+              class="form-control border-start border-bottom border-end"
+              @focusin="(e) => {e.target.closest('input').classList.add('border-primary');}"
+              @focusout="(e) => {e.target.closest('input').classList.remove('border-primary');}"
+              type="password"
+              id="message"
+            />
+            <label class="form-label" for="message">Password</label>
+          </div>
+
+          <button type="submit" class="btn btn-green btn-block">Register</button>
+        </form>
+      </div>
+      <div class="col-md-4 col-lg-4"></div>
+    </div>
+    <div>
+      <footer class="align-items-center">
+        <div class="text-center">
+          © 2020 Copyright: HOGS Saloon
+        </div>
+      </footer>
     </div>
   </div>
-  <div class="row">
-    <div class="col-md-4 col-lg-4"></div>
-    <div class="col col-md-4 col-lg-4">
-      <form @submit.prevent="addUsser" class="mb-3">
-        <div v-if="error" class="alert alert-dismissible alert-warning">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <h4 class="alert-heading">Error!</h4>
-          <p class="mb-0">{{ error }}</p>
-        </div>
-        <div v-if="succe" class="alert alert-dismissible alert-warning">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <h4 class="alert-heading">OK!</h4>
-          <p class="mb-0">{{ succe }}</p>
-        </div>
-
-        <div class="form-outline my-5">
-          <input
-            v-model="message.username"
-            type="text"
-            class="form-control"
-            id="username"
-            required
-          />
-          <label class="form-label" for="username">Username</label>
-        </div>
-
-        <div class="form-outline mb-5">
-          <input
-            v-model="message.email"
-            type="email"
-            class="form-control"
-            id="email"
-            required
-          />
-          <label class="form-label" for="email">email</label>
-        </div>
-
-        <div class="form-outline mb-5">
-          <input
-            v-model="message.password"
-            class="form-control"
-            type="password"
-            id="message"
-          />
-          <label class="form-label" for="message">Password</label>
-        </div>
-
-        <button type="submit" class="btn btn-green btn-block">Register</button>
-      </form>
-    </div>
-    <div class="col-md-4 col-lg-4"></div>
-  </div>
-  <div><footer class="bottom-100-RE">
-    <div class="text-center p-3">
-      © 2020 Copyright: HOGS Saloon
-    </div>
-  </footer></div>
 </div>
 </template>
 
@@ -169,6 +180,10 @@ export default {
             this.$router.push("/login");
           }
         });
+    },
+    logout() {
+      localStorage.removeItem("user");
+      this.$router.push("/login");
     },
   },
   computed: {
