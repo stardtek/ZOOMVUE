@@ -1,18 +1,102 @@
 <template>
-  <div class="container-fluid">
-      <div class="userLinks" v-for="(msg, index) in users" :key="index">
-          <router-link :to="{name:'privateId', params: {id: msg.username} }">
-            <span class="font-weight-bold">{{ msg.username }}:
-              </span></router-link>
+<div>
+  <div>
+      <nav class="navbar navbar-expand-lg navbar-expand-md navbar-light">
+    <div class="container-fluid">
+      <router-link class="navbar-brand" id="logo" to="/">
+        <img src="@/assets/logo.png" class="img-fluid" width="100" alt="LOGO"/>
+      </router-link>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-mdb-toggle="collapse"
+        data-mdb-target="#navbarText"
+        aria-controls="navbarText"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="fas fa-bars"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <router-link class="nav-item btn btn-smoke m-1" to="/">
+              Home
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-item btn btn-smoke m-1" to="/about">
+              About
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-item btn btn-smoke m-1" to="/chat">
+              Chat
+            </router-link>
+          </li>
+          <li class="nav-item" v-if="logedStatus === true">
+            <router-link class="nav-item btn btn-smoke m-1" to="/private">
+              Private chat
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-item btn btn-smoke m-1" to="/conference">
+              Conference
+            </router-link>
+          </li>
+        </ul>
+        <div>
+          <div v-if="logedStatus === false">
+            <router-link class="btn btn-smoke m-1" to="/login">
+              Login
+            </router-link>
+            <router-link class="btn btn-smoke m-1" to="/register">
+              Register
+            </router-link>
+          </div>
+          <div v-else>
+            <form @submit.prevent="logout">
+              <button class="btn btn-dark m-1" type="submit">Logout</button>
+            </form>
+          </div>
+        </div>
       </div>
-      <div><h3>{{ query }}</h3></div>
-      <div>
-        <div class="col" v-if="wsSocket !== null && query">
+    </div>
+  </nav>
+    </div>
+  <div class="container-fluid pt-3 pb-5">
+    <div class="row">
+      <div class="col d-flex justify-content-center">
+        <div class="d-inline"
+            v-for="(msg, index) in users" :key="index"
+        >
+          <router-link
+                  :to="{name:'privateId', params: {id: msg.username} }"
+                  class="btn my-1 mx-2"
+                  :class="msg.username === query ? 'btn-green link-smoke' : 'btn-smoke link-gray'"
+          >
+            {{ msg.username }}
+          </router-link>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-1 col-lg-2"></div>
+      <div class="col col-md-10 col-lg-8" v-if="wsSocket !== null && query">
         <chatWin v-bind:username="logedName" v-bind:wsSocket="wsSocket"></chatWin>
       </div>
-      </div>
+      <div class="col-md-1 col-lg-2"></div>
+    </div>
 
   </div>
+  <div>
+    <footer class="align-items-center">
+      <div class="text-center">
+        © 2020 Copyright: HOGS Saloon
+      </div>
+    </footer>
+  </div>
+</div>
 </template>
 
 <script>
@@ -106,7 +190,7 @@ export default {
         return localStorage.getItem('user');
       }
 
-      const rand = 'Random cunt ' + Math.floor(Math.random() * 100);
+      const rand = 'Random user ' + Math.floor(Math.random() * 100);
       return rand;
     },
     getUsernames() {
@@ -136,8 +220,5 @@ export default {
 </script>
 
 <style>
-.container-fluid {
-  background-color: #2c3e50;
-}
 
 </style>

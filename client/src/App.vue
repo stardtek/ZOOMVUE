@@ -1,23 +1,4 @@
 <template>
-  <div id="nav">
-    <router-link id="logo" to="/">
-      <img src="@/assets/logo2.jpg" width="80" alt="LOGO"/></router-link>
-    | <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/chat">Chat</router-link> |
-    <router-link to="/private">Private</router-link> |
-    <router-link to="/conference">Conference</router-link> |
-    <div v-if="logedStatus === false">
-      <router-link to="/login">Login</router-link> |
-      <router-link to="/register">Register</router-link> |
-    </div>
-
-    <div v-if="logedStatus === true">
-      <form @submit.prevent="logout">
-        <button type="submit" >Logout</button>
-      </form>
-    </div>
-  </div>
   <router-view>
   </router-view>
 </template>
@@ -55,33 +36,66 @@ export default {
   },
 };
 </script>
-<style>
+<style lang="scss">
+$orange: #FF7F50;
+$gray: #2C3E50;
+$green: #556B2F;
+$white: #FFFAFA;
+$smoke-white: #F5F5F5;
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-
-  --mdc-theme-primary: #2c3e50;
-  --mdc-theme-on-primary: #FFFAFA;
-}
-#logo {
-  float: left;
-}
-#nav {
-  padding: 30px;
-  border: #2c3e50;
-  border-width: 2px;
-  border-style: double;
+  color: $gray;
+  min-height: 100vh;
+  padding: 0 0 40px;
+  position: relative;
 }
 
-#nav a {
+.navbar {
+  background-color: $orange;
+}
+
+.navbar-toggler {
+  color: $gray;
+}
+
+footer {
+  width: 100%;
+  background-color: $orange;
+  bottom: 0;
+  height: 40px;
+  left: 0;
+  padding-top: 8px;
+  position: absolute;
+}
+
+.btn-green {
+  background-color: $green;
+  color: $white;
   font-weight: bold;
-  color: #2c3e50;
+  font-size: medium;
 }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
+.btn-smoke {
+  background-color: $smoke-white;
+  font-weight: bold;
 }
+
+.card {
+  background-color: $smoke-white;
+}
+
+.link-gray {
+  color: $gray;
+  font-size: larger;
+}
+
+.link-smoke {
+  color: $smoke-white;
+  font-size: larger;
+}
+
 </style>

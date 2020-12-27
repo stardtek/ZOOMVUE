@@ -1,29 +1,44 @@
 <template>
   <div class="card mt-3">
-            <div class="card-body">
-                <div class="card-title">
-                    <h3>Chat</h3>
-                    <hr>
-                </div>
-                <div class="card-body1">
-                    <div class="messages" v-for="(msg, index) in messages" :key="index">
-                        <p><span class="font-weight-bold">{{ msg.from }}:
-                            </span>{{ msg.message }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="card-footer">
-
-                <form>
-
-                    <div class="gorm-group pb-3">
-                        <label for="message">Message:</label>
-                        <input ref="newMessage" type="text" class="form-control" id="message">
-                    </div>
-                    <button v-on:click="send" type="submit" class="btn btn-success">Send</button>
-                </form>
-            </div>
-    </div>
+      <div class="card-body">
+          <div class="card-title">
+              <h3>Chat</h3>
+              <hr>
+          </div>
+        <div class="card-body overflow-auto" id="message-list">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item" v-for="(msg, index) in messages" :key="index">
+              <div v-if="username === msg.from"
+                   class="float-end font-weight-bold text-break text-right text-end"
+              >
+                {{ msg.message }}
+              </div>
+              <div v-else class="float-start text-justify text-break text-left text-start">
+                    <span class="font-weight-bold">
+                      {{ msg.from }}:
+                    </span>
+                {{ msg.message }}
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-footer">
+        <form @submit.prevent>
+          <div class="form-outline pb-3">
+            <input
+              ref="newMessage"
+              type="text"
+              class="form-control border-start border-bottom border-end"
+              @focusin="(e) => {e.target.closest('input').classList.add('border-primary');}"
+              @focusout="(e) => {e.target.closest('input').classList.remove('border-primary');}"
+              id="message">
+            <label class="form-label" for="message">Message</label>
+          </div>
+          <button v-on:click="send" type="submit" class="btn btn-green btn-block">Send</button>
+        </form>
+      </div>
+  </div>
 
 </template>
 
@@ -178,11 +193,7 @@ export default {
 </script>
 
 <style>
-  div.card-body {
-    margin:5px;
-    padding:5px;
-    background-color: aliceblue;
-    overflow: auto;
+  #message-list {
     height: 50vh;
   }
 </style>

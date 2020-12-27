@@ -4,7 +4,7 @@
       No video available
     </video>
     <div class="card-body">
-      <h5 class="card-title">{{ user }}</h5>
+      <h4 class="card-title font-weight-bold">{{ user }}</h4>
     </div>
   </div>
 </template>
