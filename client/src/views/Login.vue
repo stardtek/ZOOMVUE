@@ -191,5 +191,4 @@ img {
   max-width: 300px;
   height: auto;
 }
-
 </style>
