@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm run client && npm run dev",
-    "client": "npm run build --prefix client",
+    "start": "concurrently \"npm run dev\" \"npm run client\"",
+    "client": "npm run serve --prefix client",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

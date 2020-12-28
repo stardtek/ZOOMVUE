@@ -58,7 +58,7 @@ app.use('/privateChat', privateChat);
 // https://www.tutorialspoint.com/expressjs/expressjs_routing.htm
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client/dist/index.html'));
+    res.sendFile(path.join(__dirname, 'public/index.html'));
 })
 
 app.get("/messages", (req, res) => {
