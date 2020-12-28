@@ -106,9 +106,6 @@
 
 import chatWin from '../components/ChatWindow.vue';
 
-// eslint-disable-next-line no-unused-vars
-const API_URL_USERNAMES = 'http://localhost:4000/usernames';
-// const API_URL_GETMSGS = 'http://localhost:4000/getUsermessages';
 const userDisconnectedStatus = -1;
 
 export default {
@@ -134,7 +131,7 @@ export default {
   mounted: function mounted() {
     // fetch all usernames
     this.getPAram();
-    fetch(API_URL_USERNAMES, {
+    fetch(process.env.VUE_APP_API_URL_USERNAMES, {
       method: 'GET',
     })
       .then((response) => response.json())

@@ -43,15 +43,6 @@
 </template>
 
 <script>
-// import { query } from 'express';
-
-/*
-<div v-for="(user, index) in users" :key="index">
-          <p><span class="font-weight-bold">{{ user.username }}</span></p>
-      </div>
-*/
-const API_URL_GETMSGS = 'http://localhost:4000/getUsermessages';
-
 export default {
   /* eslint-disable no-console */
   name: 'TextWindow',
@@ -74,7 +65,7 @@ export default {
   mounted() {
     this.names.from = this.logedName;
     this.names.too = this.$route.params.id;
-    fetch(API_URL_GETMSGS, {
+    fetch(process.env.VUE_APP_API_URL_GETMSGS, {
       method: 'POST',
       body: JSON.stringify(this.names),
       headers: { 'content-type': 'application/json' },
@@ -138,7 +129,7 @@ export default {
     getPAram() {
       this.names.from = this.logedName;
       this.names.too = this.$route.params.id;
-      fetch(API_URL_GETMSGS, {
+      fetch(process.env.VUE_APP_API_URL_GETMSGS, {
         method: 'POST',
         body: JSON.stringify(this.names),
         headers: { 'content-type': 'application/json' },
@@ -170,7 +161,7 @@ export default {
       return rand;
     },
     update: () => {
-      fetch(API_URL_GETMSGS, {
+      fetch(process.env.VUE_APP_API_URL_GETMSGS, {
         method: 'POST',
         body: JSON.stringify(this.names),
         headers: { 'content-type': 'application/json' },
