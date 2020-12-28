@@ -3,6 +3,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 
+const path = require('path');
+
 const messages = require("./db/messages");
 const users = require("./db/users");
 
