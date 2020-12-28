@@ -1,12 +1,15 @@
 <template>
   <router-view>
+    <h1>hahahah</h1>
   </router-view>
 </template>
 <script>
+// import About from './views/About.vue';
 /* eslint quotes: ["error", "double"] */
 /* eslint-env es6 */
 
 export default {
+  components: { },
   name: "login",
   data: () => ({
     error: "",

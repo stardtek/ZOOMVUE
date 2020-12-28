@@ -1,5 +1,3 @@
-/* eslint import/no-unresolved: 2 */
-
 import { createApp } from 'vue';
 import dotenv from 'dotenv';
 import 'mdb-ui-kit/css/mdb.min.css';
