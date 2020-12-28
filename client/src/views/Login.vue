@@ -126,10 +126,6 @@
 /* eslint-env es6 */
 /* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 
-/* const API_URL = "http://localhost:4000/messages" */
-/* const API_URL_REG = "http://localhost:4000/login"; */
-const API_URL_LOG = "http://localhost:4000/login";
-
 export default {
   name: "login",
   data: () => ({
@@ -142,7 +138,7 @@ export default {
   }),
   methods: {
     login() {
-      fetch(API_URL_LOG, {
+      fetch(process.env.VUE_APP_API_URL_LOG, {
         method: "POST",
         body: JSON.stringify(this.loginData),
         headers: { "content-type": "application/json" },

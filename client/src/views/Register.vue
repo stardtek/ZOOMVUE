@@ -146,9 +146,6 @@
 /* eslint-env es6 */
 /* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 
-/* const API_URL = "http://localhost:4000/messages" */
-const API_URL_REG = "http://localhost:4000/register";
-
 export default {
   name: "register",
   data: () => ({
@@ -162,7 +159,7 @@ export default {
   }),
   methods: {
     addUsser() {
-      fetch(API_URL_REG, {
+      fetch(process.env.VUE_APP_API_URL_REG, {
         method: "POST",
         body: JSON.stringify(this.message),
         headers: { "content-type": "application/json" },

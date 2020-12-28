@@ -85,8 +85,6 @@
 <script>
 /* eslint-env es6 */
 
-// const API_URL = "http://localhost:4000/messages";
-
 export default {
   name: 'home',
   data: () => ({
