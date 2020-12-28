@@ -1,6 +1,5 @@
 <template>
   <router-view>
-    <h1>hahahah</h1>
   </router-view>
 </template>
 <script>
