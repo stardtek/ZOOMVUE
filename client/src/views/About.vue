@@ -67,7 +67,7 @@
   <div class="about pt-5">
     <h1>About us</h1>
     <div>
-      <p>Hogs sallon is an internet caffe for text and voice chat.</p>
+      <p>Hogs saloon is an internet caffe for text and voice chat.</p>
     </div>
   </div>
   <div>

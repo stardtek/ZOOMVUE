@@ -123,6 +123,7 @@ export default {
         to: this.names.too,
       });
       this.$refs.newMessage.value = '';
+      console.log('predn senda');
       this.WebSocket.send(data);
     },
 
