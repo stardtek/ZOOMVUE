@@ -10,6 +10,8 @@ const router = express.Router();
 if (!global.videoClients) global.videoClients = [];
 
 router.ws('/', (ws) => {
+  ws.setTimeout(0); // only close WS connection when user disconnects, not forced by server
+
   ws.on('message', (msg) => {
     const msgData = JSON.parse(msg);
     const users = [];
