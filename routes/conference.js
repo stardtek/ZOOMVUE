@@ -112,6 +112,10 @@ router.ws('/', (ws) => {
 
         default:
       }
+      console.log('Users in conference');
+      clients.forEach((c) => {
+        console.log('User: ', c.username, ' connected to: ', c.connectTo, ' in group: ', c.group);
+      })
     } catch (error) {
       console.log(error);
     }
