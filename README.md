@@ -4,9 +4,25 @@
 
 Create `.env` file, look in `.env.example` for needed parameters
 
-```sh
+```shell
 npm install
 npm run dev
+```
+
+## Deploy on heroku
+
+First set up `client/.env` file, check example in `client/.env.example`
+
+```shell
+heroku create # only run to make new app 
+npm install
+cd client
+npm install
+npm run build
+cd ..
+git add .
+git commit -m "deploy message"
+git push heroku master # or 'otherBranchName:master' to deploy another branch
 ```
 
 ## HTTPS connection, SSL certificate
