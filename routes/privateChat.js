@@ -60,6 +60,7 @@ router.ws('/', (ws) => {
   });
 });
 
+// WS ping-pong so we do not disconnect
 setInterval(() => {
   global.privateChatClients.forEach((c) => {
     c.ping(() => {});
