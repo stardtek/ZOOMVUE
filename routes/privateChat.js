@@ -2,15 +2,13 @@ const express = require('express');
 const router = express.Router();
 const messagesDB = require("../db/messages");
 // all users connected to this endpoint
-let clients = [];
+if (!global.privateChatClients) global.privateChatClients = [];
 
 const userDisconnectedStatus = -1;
 
 router.ws('/', (ws) => {
   // Add new client to Broadcast list
-  clients.push(ws);
-
-
+  global.privateChatClients.push(ws);
 
   ws.on('message', (msg) => {
     // broadcast frame to all connected clients
@@ -38,16 +36,16 @@ router.ws('/', (ws) => {
   });
 
   ws.on('close', () => {
-    const disconectedClient = clients.indexOf(ws);
+    const disconectedClient = global.privateChatClients.indexOf(ws);
     if (disconectedClient !== -1) {
 
       // send user disconnected status
-      clients.forEach((client) => {
+      global.privateChatClients.forEach((client) => {
         if (client !== ws) {
           try {
             client.send(JSON.stringify({
               disconected: true,
-              username: clients[disconectedClient].username,
+              username: global.privateChatClients[disconectedClient].username,
               frame: userDisconnectedStatus,
             }));
           } catch {
@@ -56,10 +54,16 @@ router.ws('/', (ws) => {
         }
       });
 
-      clients.splice(disconectedClient, 1);
+      global.privateChatClients.splice(disconectedClient, 1);
       console.log('Client disconnected...');
     }
   });
 });
+
+setInterval(() => {
+  global.privateChatClients.forEach((c) => {
+    c.ping(() => {});
+  });
+}, 1000);
 
 module.exports = router;

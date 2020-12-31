@@ -6,7 +6,6 @@ const router = express.Router();
 // - username: string,
 // - connectTo: string - optional, specifies which user this peer connects to,
 // - group: string
-// let clients = [];
 if (!global.videoClients) global.videoClients = [];
 
 router.ws('/', (ws) => {
