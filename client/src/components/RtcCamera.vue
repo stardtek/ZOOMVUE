@@ -10,6 +10,10 @@
 </template>
 
 <script>
+// adapter just makes sure that all webRTC function names are the same across all browsers
+// eslint-disable-next-line no-unused-vars
+import adapter from 'webrtc-adapter';
+
 export default {
   name: 'rtcCamera',
 
@@ -72,7 +76,7 @@ export default {
     // Get access to the camera!
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices.getUserMedia({
-        video: true,
+        video: { frameRate: { ideal: 15, max: 20 } },
         audio: true,
       }).then((stream) => {
         stream.getTracks().forEach((track) => {

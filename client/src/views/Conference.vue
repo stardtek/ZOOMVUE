@@ -114,9 +114,6 @@
 </template>
 
 <script>
-// adapter just makes sure that all webRTC function names are the same across all browsers
-// eslint-disable-next-line no-unused-vars
-import adapter from 'webrtc-adapter';
 import VideoChat from '@/components/VideoChat.vue';
 import TextWindow from '@/components/TextWindow.vue';
 
