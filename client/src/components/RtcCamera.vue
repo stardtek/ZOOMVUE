@@ -141,11 +141,11 @@ export default {
     this.rtcPeer.onicecandidate = (event) => {
       // this needs to wait for remote user to be set before you add candidates
       // otherwise Chrome throw errors
-      if (!this.rtcPeer || !this.rtcPeer.remoteDescription
-        || !this.rtcPeer.remoteDescription.type) {
-        this.rtcPeerCandidatesQueue.push(event.candidate);
-        return;
-      }
+      // if (!this.rtcPeer || !this.rtcPeer.remoteDescription
+      //   || !this.rtcPeer.remoteDescription.type) {
+      //   this.rtcPeerCandidatesQueue.push(event.candidate);
+      //   return;
+      // }
 
       this.rtcPeer.addIceCandidate(event.candidate).then(() => {
         // eslint-disable-next-line no-console
@@ -153,6 +153,7 @@ export default {
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.log(error);
+        this.rtcPeerCandidatesQueue.push(event.candidate);
       });
     };
 
@@ -196,7 +197,7 @@ export default {
         // for whatever reason offer <-> answer needs to happen a few times...
         this.sendOffer();
       }
-    }, 5000);
+    }, 1000);
   },
 
   methods: {
