@@ -13,7 +13,18 @@ function getAll() {
   return messages.find();
 }
 async function getMessages(usernames) {
-  return messages.find({to: {$in: [usernames.too, usernames.from] } ,from: {$in: [usernames.too, usernames.from] }});
+  if(usernames.too !== usernames.from){
+    // return messages.find({to: {$in: [usernames.too, usernames.from] } ,from: {$in: [usernames.too, usernames.from] }});
+    return messages.find({$or : 
+      [{to: {$in: [usernames.too] } ,from: {$in: [usernames.from] }},
+      {to: {$in: [usernames.from] } ,from: {$in: [usernames.too] }}, ]
+    });
+    
+  }
+  else{
+    return messages.find({to: {$in: [usernames.too] } ,from: {$in: [usernames.from] }});
+  }
+  
 
   
 }

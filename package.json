@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "serve": "vue-cli-service serve",
     "start": "npm run dev",
     "client": "npm install --prefix client && npm run build --prefix client",
     "dev": "nodemon index.js",
