@@ -172,7 +172,8 @@ export default {
       console.log('ice state', this.rtcPeer.iceConnectionState);
 
       // check for Ice Candidates in queue and add them to connection
-      if ((this.rtcPeer.connectionState === 'new' || this.rtcPeer.connectionState === 'connecting')
+      if ((this.rtcPeer.connectionState === 'new' || this.rtcPeer.connectionState === 'connecting'
+        || this.rtcPeer.iceConnectionState === 'checking')
         && this.rtcPeerCandidatesQueue.length !== 0) {
         this.rtcPeerCandidatesQueue.forEach((candidate) => {
           this.rtcPeer.addIceCandidate(candidate).then(() => {

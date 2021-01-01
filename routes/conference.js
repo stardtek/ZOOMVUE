@@ -6,7 +6,7 @@ const router = express.Router();
 // - username: string,
 // - connectTo: string - optional, specifies which user this peer connects to,
 // - group: string
-let clients = [];
+if (!global.videoClients) global.videoClients = [];
 
 router.ws('/', (ws) => {
   ws.on('message', (msg) => {
@@ -25,7 +25,7 @@ router.ws('/', (ws) => {
            * }
            */
           // send new users info to all other users
-          clients.filter((client) => client.group === msgData.group).forEach((client) => {
+          global.videoClients.filter((client) => client.group === msgData.group).forEach((client) => {
             client.send(JSON.stringify({
               username: msgData.username,
               type: 'user-joined',
@@ -33,7 +33,7 @@ router.ws('/', (ws) => {
           });
 
           // send list of present users to new user
-          clients.filter((client) => client.group === msgData.group).forEach((client) => {
+          global.videoClients.filter((client) => client.group === msgData.group).forEach((client) => {
             if (!client.connectTo) {
               users.push(client.username);
             }
@@ -46,7 +46,7 @@ router.ws('/', (ws) => {
           // new user to list of all users
           ws.username = msgData.username;
           ws.group = msgData.group;
-          clients.push(ws);
+          global.videoClients.push(ws);
 
           console.log('user-joined', msgData.username, 'group', msgData.group);
           break;
@@ -64,11 +64,11 @@ router.ws('/', (ws) => {
             ws.username = msgData.username;
             ws.connectTo = msgData.connectTo;
             ws.group = msgData.group;
-            clients.push(ws);
+            global.videoClients.push(ws);
           }
 
           // print present users
-          clients.forEach((client) => {
+          global.videoClients.forEach((client) => {
             if (!client.connectTo) {
               console.log('user:', client.username, 'group:', client.group);
             }
@@ -87,9 +87,9 @@ router.ws('/', (ws) => {
            *   description: RTC localDescription
            * }
            */
-          client = clients.find(client => client.username === msgData.to &&
-                                client.connectTo === msgData.from &&
-                                client.group === msgData.group);
+          client = global.videoClients.find(client => client.username === msgData.to &&
+                                            client.connectTo === msgData.from &&
+                                            client.group === msgData.group);
           console.log('offer by', msgData.from, 'for', msgData.to, 'in', msgData.group);
           if (client) client.send(msg);
           break;
@@ -103,30 +103,34 @@ router.ws('/', (ws) => {
            *   description: RTC localDescription
            * }
            */
-          client = clients.find(client => client.username === msgData.to &&
-                                client.connectTo === msgData.from &&
-                                client.group === msgData.group);
+          client = global.videoClients.find(client => client.username === msgData.to &&
+                                            client.connectTo === msgData.from &&
+                                            client.group === msgData.group);
           console.log('answer by', msgData.from, 'for', msgData.to, 'in', msgData.group);
           if (client) client.send(msg);
           break;
 
         default:
       }
+      console.log('Users in conference');
+      global.videoClients.forEach((c) => {
+        console.log('User:', c.username, 'connected to:', c.connectTo, 'in group:', c.group);
+      })
     } catch (error) {
       console.log(error);
     }
   });
 
   ws.on('close', () => {
-    const disconnectedClient = clients.indexOf(ws);
+    const disconnectedClient = global.videoClients.indexOf(ws);
     if (disconnectedClient !== -1) {
 
       // send user disconnected status
-      clients.filter(client => client.group === ws.group).forEach((client) => {
+      global.videoClients.filter(client => client.group === ws.group).forEach((client) => {
         if (client !== ws) {
           try {
             client.send(JSON.stringify({
-              username: clients[disconnectedClient].username,
+              username: global.videoClients[disconnectedClient].username,
               type: 'user-disconnected',
             }));
           } catch {
@@ -135,10 +139,17 @@ router.ws('/', (ws) => {
         }
       });
 
-      clients.splice(disconnectedClient, 1);
+      global.videoClients.splice(disconnectedClient, 1);
       console.log('Client disconnected...');
     }
   });
 });
+
+// WS ping-pong so we do not disconnect
+setInterval(() => {
+  global.videoClients.forEach((c) => {
+    c.ping(() => {});
+  });
+}, 1000);
 
 module.exports = router;

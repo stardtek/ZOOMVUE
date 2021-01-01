@@ -117,6 +117,7 @@ export default {
   methods: {
     // eslint-disable-next-line no-unused-vars
     send(event) {
+      if (this.$refs.newMessage.value === '') return;
       const data = JSON.stringify({
         from: this.logedName,
         message: this.$refs.newMessage.value,

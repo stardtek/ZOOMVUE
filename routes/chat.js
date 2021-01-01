@@ -2,19 +2,17 @@ const express = require('express');
 const router = express.Router();
 
 // all users connected to this endpoint
-let clients = [];
+if (!global.chatClients) global.chatClients = [];
 
 const userDisconnectedStatus = -1;
 
 router.ws('/', (ws) => {
   // Add new client to Broadcast list
-  clients.push(ws);
-
-
+  global.chatClients.push(ws);
 
   ws.on('message', (msg) => {
     // broadcast frame to all connected clients
-    clients.forEach((client) => {
+    global.chatClients.forEach((client) => {
       const msgData = JSON.parse(msg);
       if (!client.username) {
         // add username to each socket, so we can tell later which user disconnected
@@ -37,16 +35,16 @@ router.ws('/', (ws) => {
   });
 
   ws.on('close', () => {
-    const disconectedClient = clients.indexOf(ws);
+    const disconectedClient = global.chatClients.indexOf(ws);
     if (disconectedClient !== -1) {
 
       // send user disconnected status
-      clients.forEach((client) => {
+      global.chatClients.forEach((client) => {
         if (client !== ws) {
           try {
             client.send(JSON.stringify({
               disconected: true,
-              username: clients[disconectedClient].username,
+              username: global.chatClients[disconectedClient].username,
               frame: userDisconnectedStatus,
             }));
           } catch {
@@ -55,10 +53,17 @@ router.ws('/', (ws) => {
         }
       });
 
-      clients.splice(disconectedClient, 1);
+      global.chatClients.splice(disconectedClient, 1);
       console.log('Client disconnected...');
     }
   });
 });
+
+// WS ping-pong so we do not disconnect
+setInterval(() => {
+  global.chatClients.forEach((c) => {
+    c.ping(() => {});
+  });
+}, 1000);
 
 module.exports = router;
