@@ -13,7 +13,7 @@ router.ws('/', (ws) => {
   ws.on('message', (msg) => {
     // broadcast frame to all connected clients
     messagesDB.save( JSON.parse(msg));
-    clients.forEach((client) => {
+    global.privateChatClients.forEach((client) => {
       const msgData = JSON.parse(msg);
       console.log(msgData);
       if (!client.username) {
@@ -63,7 +63,9 @@ router.ws('/', (ws) => {
 // WS ping-pong so we do not disconnect
 setInterval(() => {
   global.privateChatClients.forEach((c) => {
-    c.ping(() => {});
+    try {
+      c.ping(() => {});
+    } catch {}
   });
 }, 1000);
 

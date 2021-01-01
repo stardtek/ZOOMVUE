@@ -148,7 +148,9 @@ router.ws('/', (ws) => {
 // WS ping-pong so we do not disconnect
 setInterval(() => {
   global.videoClients.forEach((c) => {
-    c.ping(() => {});
+    try {
+      c.ping(() => {});
+    } catch {}
   });
 }, 1000);
 
