@@ -141,11 +141,11 @@ export default {
     this.rtcPeer.onicecandidate = (event) => {
       // this needs to wait for remote user to be set before you add candidates
       // otherwise Chrome throw errors
-      // if (!this.rtcPeer || !this.rtcPeer.remoteDescription
-      //   || !this.rtcPeer.remoteDescription.type) {
-      //   this.rtcPeerCandidatesQueue.push(event.candidate);
-      //   return;
-      // }
+      if (!this.rtcPeer || !this.rtcPeer.remoteDescription
+        || !this.rtcPeer.remoteDescription.type) {
+        this.rtcPeerCandidatesQueue.push(event.candidate);
+        return;
+      }
 
       this.rtcPeer.addIceCandidate(event.candidate).then(() => {
         // eslint-disable-next-line no-console
@@ -153,7 +153,6 @@ export default {
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.log(error);
-        this.rtcPeerCandidatesQueue.push(event.candidate);
       });
     };
 
@@ -169,7 +168,6 @@ export default {
       this.$refs.camera.srcObject = event.streams[0];
     };
 
-    // TODO this interval should be stopped when camera connection succeeds
     setInterval(() => {
       // eslint-disable-next-line no-console
       console.log('rtcPeer', this.rtcPeer.connectionState);

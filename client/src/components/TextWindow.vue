@@ -61,15 +61,6 @@
 </template>
 
 <script>
-
-/*
-<div v-for="(user, index) in users" :key="index">
-          <p><span class="font-weight-bold">{{ user.username }}</span></p>
-      </div>
-*/
-
-// TODO add room number with send message for server to know who to send to
-
 export default {
   /* eslint-disable no-console */
   name: 'TextWindow',
