@@ -198,7 +198,7 @@ export default {
       }
 
       connectTryCount += 1;
-      if (connectTryCount > 10) clearInterval(interval);
+      if (connectTryCount > 20) clearInterval(interval);
     }, 1000);
   },
 
