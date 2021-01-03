@@ -204,7 +204,7 @@ export default {
 
   beforeUnmount() {
     this.ws.close();
-    this.rtcPeer.close();
+    // this.rtcPeer.close();
   },
 
   methods: {
