@@ -202,6 +202,11 @@ export default {
     }, 1000);
   },
 
+  beforeUnmount() {
+    this.ws.close();
+    this.rtcPeer.close();
+  },
+
   methods: {
     /**
      * Send RTC offer to remote user
