@@ -123,7 +123,7 @@ router.ws('/', (ws) => {
 
       // send user disconnected status
       global.videoClients.filter(client => client.group === ws.group &&
-                                 client.connectTo === ws.username).forEach((client) => {
+                                 client.username === ws.connectTo).forEach((client) => {
         if (client !== ws) {
           try {
             client.send(JSON.stringify({
