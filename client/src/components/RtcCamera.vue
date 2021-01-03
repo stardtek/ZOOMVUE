@@ -192,7 +192,7 @@ export default {
         });
       }
 
-      if (this.shouldOffer) {
+      if (this.shouldOffer && this.rtcPeer.connectionState !== 'closed') {
         // for whatever reason offer <-> answer needs to happen a few times...
         this.sendOffer();
       }
