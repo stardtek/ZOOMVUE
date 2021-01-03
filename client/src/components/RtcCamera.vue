@@ -203,8 +203,8 @@ export default {
   },
 
   beforeUnmount() {
-    this.ws.close();
-    // this.rtcPeer.close();
+    // this.ws.close();
+    this.rtcPeer.close();
   },
 
   methods: {
