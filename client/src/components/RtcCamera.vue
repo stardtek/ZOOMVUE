@@ -168,7 +168,8 @@ export default {
       this.$refs.camera.srcObject = event.streams[0];
     };
 
-    setInterval(() => {
+    let connectTryCount = 0;
+    const interval = setInterval(() => {
       // eslint-disable-next-line no-console
       console.log('rtcPeer', this.rtcPeer.connectionState);
       // eslint-disable-next-line no-console
@@ -195,6 +196,9 @@ export default {
         // for whatever reason offer <-> answer needs to happen a few times...
         this.sendOffer();
       }
+
+      connectTryCount += 1;
+      if (connectTryCount > 10) clearInterval(interval);
     }, 1000);
   },
 
