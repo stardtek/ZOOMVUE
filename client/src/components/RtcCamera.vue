@@ -1,6 +1,6 @@
 <template>
   <div class="card m-1">
-    <video  class="card-img-top" ref="camera" autoplay>
+    <video  class="card-img-top" ref="camera" autoplay controls>
       No video available
     </video>
     <div class="card-body">
@@ -203,7 +203,7 @@ export default {
   },
 
   beforeUnmount() {
-    // this.ws.close();
+    this.ws.close();
     this.rtcPeer.close();
   },
 
