@@ -1,4 +1,6 @@
 client/src/assets/** export-ignore
 client/dist/** export-ignore
+client/public/** export-ignore
 * text eol=lf
 *.png binary
+*.ico binary
