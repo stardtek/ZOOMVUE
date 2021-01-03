@@ -99,7 +99,8 @@
         ></video-chat>
       </div>
       <div class="col-sm-6 col-md-3 col-lg-3">
-        <text-window v-bind:username="logedName"></text-window>
+        <text-window v-bind:username="logedName"
+                     v-bind:in-conference="true"></text-window>
       </div>
     </div>
   </div>

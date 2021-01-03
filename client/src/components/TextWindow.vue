@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <div class="active-users">
+    <div class="active-users" v-if="!inConference">
       <div class="card-body">
         <div class="card-title">
           <h3>Active users:</h3>
@@ -67,7 +67,7 @@ export default {
 
   props: [
     'username',
-
+    'inConference',
   ],
 
   data: () => ({

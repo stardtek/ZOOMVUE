@@ -68,7 +68,7 @@
     <div class="row"  v-if="wsSocket !== null && query">
       <div class="col-md-2 col-lg-2"></div>
       <div class="col col-md-8 col-lg-8">
-        <chatWin v-bind:username="logedName" v-bind:wsSocket="wsSocket"></chatWin>
+        <chatWin v-bind:username="logedName" v-bind:in-conference="false"></chatWin>
       </div>
       <div class="col-md-2 col-lg-2"></div>
     </div>
